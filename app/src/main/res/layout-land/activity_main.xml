@@ -5,14 +5,14 @@
     android:id="@+id/mainView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#A29999">
+    android:background="#A29999"
+    tools:ignore="MissingDefaultResource">
 
     <!-- Rectangle Noir -->
     <View
         android:id="@+id/groundView"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginTop="325dp"
+        android:layout_height="50dp"
         android:background="#1F1E1E"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
