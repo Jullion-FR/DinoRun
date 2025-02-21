@@ -2,76 +2,73 @@ package com.example.gamecrashtest
 
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
+import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var mainView:View
+    private lateinit var mainView:ConstraintLayout
     private lateinit var groundView:View
-    private lateinit var dinoImageView:ImageView
     private lateinit var scoreTextView:TextView
 
-    private var isJumping:Boolean = false
+    private lateinit var dino:Dinosaur
+    private var score = 0
+    private val handler = Handler(Looper.getMainLooper())
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        val layout = R.layout.activity_main
+        setContentView(layout)
         hideSystemUI()  //TEMP and bad
-
-        val DEFAULT_SCORE = 0
-
 
         mainView = findViewById(R.id.mainView)
         groundView = findViewById(R.id.groundView)
-        dinoImageView = findViewById(R.id.dinoImageView)
+        dino = Dinosaur(findViewById(R.id.dinoImageView))
 
+        val DEFAULT_SCORE = 0
         scoreTextView = findViewById(R.id.scoreTextView)
         scoreTextView.text = "$DEFAULT_SCORE"
 
+        var cactus: Cactus
         mainView.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_UP && !isJumping) {
-                isJumping = true
-                dinoJump(325)
+            if (!dino.isJumping) {
+                runOnUiThread { dino.jump() }
                 addScore(1)
             }
             true
         }
-
-
+        addCactus()
     }
+    private fun addCactus() {
+        if (score < 2) {
+            val cactus = Cactus(this)
+            mainView.addView(cactus.cactusImageView)
+            cactus.move()
+            
+            // Recommence après 2 secondes
+            handler.postDelayed({ addCactus() }, 2000)
+        }
+    }
+
     private fun addScore(scoreToAdd:Int){
         val scoreRender = scoreTextView
-        var score = (scoreRender.text).toString().toInt()
         score += scoreToAdd
         scoreRender.text = "$score"
     }
 
-    private fun dinoJump(height: Int) {
-        val baseDinoY = dinoImageView.y
-
-        val animUp = ObjectAnimator.ofFloat(dinoImageView, "y", baseDinoY, baseDinoY - height)
-        val animDown = ObjectAnimator.ofFloat(dinoImageView, "y", baseDinoY - height, baseDinoY)
-
-        val duration: Long = 300
-        animUp.duration = duration
-        animDown.duration = duration
-
-        animUp.start()
-        animUp.doOnEnd {
-            animDown.start()
-            animDown.doOnEnd {
-                isJumping = false
-            }
-        }
-    }
     //TEMP and bad
     private fun hideSystemUI() {
         window.decorView.systemUiVisibility = (
@@ -83,4 +80,6 @@ class MainActivity : AppCompatActivity() {
                         or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 )
     }
+
+
 }
