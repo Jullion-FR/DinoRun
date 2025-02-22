@@ -14,6 +14,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import java.io.IOException
 
 
@@ -27,6 +29,8 @@ class MainActivity : AppCompatActivity() {
     private var score = 0
     private val handler = Handler(Looper.getMainLooper())
 
+    var isGameLaunched = false
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,31 +40,50 @@ class MainActivity : AppCompatActivity() {
 
         mainView = findViewById(R.id.mainView)
         groundView = findViewById(R.id.groundView)
+
         dino = Dinosaur(findViewById(R.id.dinoImageView))
 
         val DEFAULT_SCORE = 0
         scoreTextView = findViewById(R.id.scoreTextView)
         scoreTextView.text = "$DEFAULT_SCORE"
 
-        var cactus: Cactus
         mainView.setOnTouchListener { _, event ->
-            if (!dino.isJumping) {
-                runOnUiThread { dino.jump() }
-                addScore(1)
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                touchScreenResponse()
             }
             true
         }
+
+    }
+
+    private fun touchScreenResponse(){
+
+        lifecycleScope.launch{
+            if (!isGameLaunched){
+                lifecycleScope.launch {
+                    dino.startGameAnimation()
+                }
+                isGameLaunched = true
+                lifecycleScope.launch{
+                    generateCacties()
+                }
+            }else{
+                dino.touchScreenResponse()
+                addScore(1)
+            }
+        }
+    }
+
+    private fun generateCacties() {
         addCactus()
     }
+
     private fun addCactus() {
-        if (score < 2) {
-            val cactus = Cactus(this)
-            mainView.addView(cactus.cactusImageView)
-            cactus.move()
-            
-            // Recommence après 2 secondes
-            handler.postDelayed({ addCactus() }, 2000)
-        }
+        val cactus = Cactus(this)
+        mainView.addView(cactus.cactusImageView)
+        cactus.move()
+        //todo change this looping method and move to Cactus class
+        handler.postDelayed({ addCactus() }, 2000)
     }
 
     private fun addScore(scoreToAdd:Int){

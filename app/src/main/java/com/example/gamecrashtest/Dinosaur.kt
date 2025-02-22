@@ -2,17 +2,39 @@ package com.example.gamecrashtest
 
 import android.animation.ObjectAnimator
 import android.widget.ImageView
-import androidx.annotation.UiThread
 import androidx.core.animation.doOnEnd
+import kotlinx.coroutines.delay
 
-class Dinosaur(private var dinoImageView: ImageView) {
+class Dinosaur(private val dinoImageView: ImageView) {
+    private var isJumping = false
 
-    var isJumping = false
-        private set
+    private val runningSprites = listOf(
+        R.drawable.dino_run1,
+        R.drawable.dino_run2
+    )
 
-    fun jump(height: Int = 300) {
+    init {
+        dinoImageView.setImageResource(R.drawable.dino_idle)
+    }
+
+    suspend fun startGameAnimation(){
+        dinoImageView.setImageResource(R.drawable.dino_death)
+        delay(300)
+        jump(100)
+        cycleSprites()
+    }
+
+    fun touchScreenResponse(){
+        if (!isJumping) {
+            isJumping = true
+            jump()
+        }
+    }
+
+    private fun jump(height: Int = 300) {
+        dinoImageView.setImageResource(R.drawable.dino_jump)
+
         val baseDinoY = dinoImageView.y
-
         val animUp = ObjectAnimator.ofFloat(dinoImageView, "y", baseDinoY, baseDinoY - height)
         val animDown = ObjectAnimator.ofFloat(dinoImageView, "y", baseDinoY - height, baseDinoY)
 
@@ -27,6 +49,17 @@ class Dinosaur(private var dinoImageView: ImageView) {
             animDown.doOnEnd {
                 isJumping = false
             }
+        }
+    }
+
+     private suspend fun cycleSprites(){
+        var index = 0
+        while (true) {
+            if(!isJumping) {
+                dinoImageView.setImageResource(runningSprites[index])
+                index = (index + 1) % runningSprites.size
+            }
+            delay(75)
         }
     }
 }

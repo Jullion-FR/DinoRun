@@ -2,28 +2,30 @@ package com.example.gamecrashtest
 
 import android.animation.ObjectAnimator
 import android.content.Context
+import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.animation.doOnEnd
 import com.example.gamecrashtest.Tools.Companion.dpToPx
-import kotlin.random.Random
+
 
 class Cactus(private val context : Context, var speed:Int = 0, private val size: CactusSizesEnum = CactusSizesEnum.Small):
     AppCompatActivity() {
     val cactusImageView = ImageView(context)
 
     init {
-        // Définition des dimensions
+        //Dimensions
         val width = context.dpToPx(40)
         val height = if (size == CactusSizesEnum.Small) context.dpToPx(75) else context.dpToPx(100)
 
-        // Positionner l'image
+        //Position
         val params = ConstraintLayout.LayoutParams(width, height)
 
-        // Droite
+        //Right
         params.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
         params.marginEnd = 0
-        // Bas
+        //Left
         params.bottomToTop = R.id.groundView
         params.bottomMargin = context.dpToPx(-14)
 
@@ -31,7 +33,7 @@ class Cactus(private val context : Context, var speed:Int = 0, private val size:
 
         cactusImageView.layoutParams = params
 
-        // Choix de l'image selon la taille
+        //Choosing sprite according to size
         val resSprite: Int = when (size) {
             CactusSizesEnum.Medium -> R.drawable.cactus_medium1
             CactusSizesEnum.Small -> {
@@ -57,10 +59,15 @@ class Cactus(private val context : Context, var speed:Int = 0, private val size:
             cactusImageView,
             "x",
             screenWidth,
-            -cactusImageView.width.toFloat()
-        )
+            -screenWidth/2
+        ).apply {
+            interpolator = LinearInterpolator()
+            duration = 1500
+            start()
+        }.doOnEnd {dropSelf()}
+    }
 
-        slideLeft.duration = 15000
-        slideLeft.start()
+    private fun dropSelf(){
+        Tools.removeView(cactusImageView)
     }
 }
