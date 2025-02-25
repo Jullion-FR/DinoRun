@@ -58,7 +58,6 @@ class Cactus(
         x = Tools.screenWidth
     }
     private fun dropSelfFromParent() {
-        println("${x}")
         parentLayout.removeView(cactusImageView)
     }
     private fun addSelfToParent() {

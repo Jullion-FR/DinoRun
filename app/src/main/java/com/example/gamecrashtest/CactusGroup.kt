@@ -12,7 +12,7 @@ class CactusGroup(
         for (cactus: Cactus in cactusList){
             cactus.spawn()
             for(i in 0..< cactusList.indexOf(cactus)){
-                //cactusList[i] in case of offsets in size (ex: SmlMedSml)
+                //cactusList[i] in case of different sizes in group (ex: SmlMedSml)
                 cactus.spriteOffset = cactusList[i].size.width.dpToPx.toFloat()/2
             }
         }

@@ -20,12 +20,12 @@ class Dinosaur(private val dinoImageView: ImageView) {
     init {
         dinoImageView.setImageResource(R.drawable.dino_idle)
     }
-
-    suspend fun startGameAnimation(){
+    suspend fun dinoStartingAnimation(){
         dinoImageView.setImageResource(R.drawable.dino_death)
-        delay(300)
-        if (!isJumping) jump(125)
-        startSpriteCycle()
+        if (!isJumping){
+            delay(300)
+            jump(125)
+        }
     }
 
     fun touchScreenResponse(){
@@ -63,7 +63,7 @@ class Dinosaur(private val dinoImageView: ImageView) {
         }
     }.flowOn(Dispatchers.Default) // Exécuter sur un thread différent de la UI
 
-    private suspend fun startSpriteCycle() {
+    suspend fun startSpriteCycle() {
         spriteFlow().collect { sprite ->
             if (!isJumping) {
                 dinoImageView.setImageResource(sprite)

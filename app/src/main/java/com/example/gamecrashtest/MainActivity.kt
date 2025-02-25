@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.gamecrashtest.Tools.Companion.initScreenWidth
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 
@@ -49,29 +51,40 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun touchScreenResponse(){
-        when{
-            !isGameLaunched->{
-                isGameLaunched = true
-                lifecycleScope.launch {
-                    dino.startGameAnimation()
-                }
+    private fun touchScreenResponse() {
+        if (!isGameLaunched) {
+            isGameLaunched = true
+            lifecycleScope.launch {
+                dino.dinoStartingAnimation()
+                dino.startSpriteCycle()
             }
-            else-> runOnUiThread{
+            lifecycleScope.launch {
+                delay(3000)
+                cactusSpawner()
+            }
+        } else {
+            runOnUiThread {
                 dino.touchScreenResponse()
                 addScore(1)
             }
         }
-        lifecycleScope.launch {
-            cactusTest()
-        }
     }
 
-    private suspend fun cactusTest() {
-        val cactusGroupFactory = CactusGroupFactory(mainView)
-        val cactusGroup = cactusGroupFactory.buildCactusGroup(CactusGroupsEnum.SmlSml)
-        cactusGroup.spawn()
-        cactusGroup.startMoving(lifecycleScope)
+
+    private fun cactusSpawner() {
+        lifecycleScope.launch {
+            val cactusGroupFactory = CactusGroupFactory(mainView)
+            while (isActive) {
+                val randomCactusGroup = CactusGroupsEnum.entries.random()
+                println(randomCactusGroup)
+                val cactusGroup = cactusGroupFactory.buildCactusGroup(randomCactusGroup)
+
+                cactusGroup.spawn()
+                cactusGroup.startMoving(lifecycleScope)
+
+                delay(5000)
+            }
+        }
     }
 
     private fun addScore(scoreToAdd:Int){
