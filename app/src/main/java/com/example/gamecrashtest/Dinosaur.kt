@@ -3,10 +3,14 @@ package com.example.gamecrashtest
 import android.animation.ObjectAnimator
 import android.widget.ImageView
 import androidx.core.animation.doOnEnd
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 class Dinosaur(private val dinoImageView: ImageView) {
     private var isJumping = false
+    //private var baseDinoY:Float
 
     private val runningSprites = listOf(
         R.drawable.dino_run1,
@@ -20,21 +24,20 @@ class Dinosaur(private val dinoImageView: ImageView) {
     suspend fun startGameAnimation(){
         dinoImageView.setImageResource(R.drawable.dino_death)
         delay(300)
-        jump(100)
-        cycleSprites()
+        if (!isJumping) jump(125)
+        startSpriteCycle()
     }
 
     fun touchScreenResponse(){
-        if (!isJumping) {
-            isJumping = true
-            jump()
-        }
+        if (!isJumping) jump()
     }
 
     private fun jump(height: Int = 300) {
+        isJumping = true
+        val baseDinoY = dinoImageView.y
+
         dinoImageView.setImageResource(R.drawable.dino_jump)
 
-        val baseDinoY = dinoImageView.y
         val animUp = ObjectAnimator.ofFloat(dinoImageView, "y", baseDinoY, baseDinoY - height)
         val animDown = ObjectAnimator.ofFloat(dinoImageView, "y", baseDinoY - height, baseDinoY)
 
@@ -42,7 +45,6 @@ class Dinosaur(private val dinoImageView: ImageView) {
         animUp.duration = duration
         animDown.duration = duration
 
-        isJumping = true
         animUp.start()
         animUp.doOnEnd {
             animDown.start()
@@ -52,14 +54,20 @@ class Dinosaur(private val dinoImageView: ImageView) {
         }
     }
 
-     private suspend fun cycleSprites(){
+    private fun spriteFlow() = flow {
         var index = 0
         while (true) {
-            if(!isJumping) {
-                dinoImageView.setImageResource(runningSprites[index])
-                index = (index + 1) % runningSprites.size
-            }
+            emit(runningSprites[index])
+            index = (index + 1) % runningSprites.size
             delay(75)
+        }
+    }.flowOn(Dispatchers.Default) // Exécuter sur un thread différent de la UI
+
+    private suspend fun startSpriteCycle() {
+        spriteFlow().collect { sprite ->
+            if (!isJumping) {
+                dinoImageView.setImageResource(sprite)
+            }
         }
     }
 }

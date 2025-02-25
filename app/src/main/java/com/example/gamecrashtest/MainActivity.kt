@@ -1,22 +1,15 @@
 package com.example.gamecrashtest
 
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.animation.doOnEnd
 import androidx.lifecycle.lifecycleScope
+import com.example.gamecrashtest.Tools.Companion.initScreenWidth
 import kotlinx.coroutines.launch
-import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
@@ -27,7 +20,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var dino:Dinosaur
     private var score = 0
-    private val handler = Handler(Looper.getMainLooper())
 
     var isGameLaunched = false
 
@@ -36,7 +28,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val layout = R.layout.activity_main
         setContentView(layout)
+
         hideSystemUI()  //TEMP and bad
+        initScreenWidth(this)
 
         mainView = findViewById(R.id.mainView)
         groundView = findViewById(R.id.groundView)
@@ -53,37 +47,31 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-
     }
 
     private fun touchScreenResponse(){
-
-        lifecycleScope.launch{
-            if (!isGameLaunched){
+        when{
+            !isGameLaunched->{
+                isGameLaunched = true
                 lifecycleScope.launch {
                     dino.startGameAnimation()
                 }
-                isGameLaunched = true
-                lifecycleScope.launch{
-                    generateCacties()
-                }
-            }else{
+            }
+            else-> runOnUiThread{
                 dino.touchScreenResponse()
                 addScore(1)
             }
         }
+        lifecycleScope.launch {
+            cactusTest()
+        }
     }
 
-    private fun generateCacties() {
-        addCactus()
-    }
-
-    private fun addCactus() {
-        val cactus = Cactus(this)
-        mainView.addView(cactus.cactusImageView)
-        cactus.move()
-        //todo change this looping method and move to Cactus class
-        handler.postDelayed({ addCactus() }, 2000)
+    private suspend fun cactusTest() {
+        val cactusGroupFactory = CactusGroupFactory(mainView)
+        val cactusGroup = cactusGroupFactory.buildCactusGroup(CactusGroupsEnum.SmlSml)
+        cactusGroup.spawn()
+        cactusGroup.startMoving(lifecycleScope)
     }
 
     private fun addScore(scoreToAdd:Int){

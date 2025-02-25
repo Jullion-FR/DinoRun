@@ -1,73 +1,67 @@
 package com.example.gamecrashtest
 
 import android.animation.ObjectAnimator
-import android.content.Context
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import com.example.gamecrashtest.Tools.Companion.dpToPx
 
-
-class Cactus(private val context : Context, var speed:Int = 0, private val size: CactusSizesEnum = CactusSizesEnum.Small):
-    AppCompatActivity() {
-    val cactusImageView = ImageView(context)
+class Cactus(
+    private val parentLayout: ConstraintLayout,
+    var speed: Long = 2500L,
+    val size: CactusSizesEnum = CactusSizesEnum.Small
+) {
+    private val cactusImageView = ImageView(parentLayout.context)
+    var spriteOffset = 0f
+    var x: Float
+        get() = cactusImageView.x
+        set(value) {
+            cactusImageView.x = value
+        }
 
     init {
-        //Dimensions
-        val width = context.dpToPx(40)
-        val height = if (size == CactusSizesEnum.Small) context.dpToPx(75) else context.dpToPx(100)
+        // Dimensions
+        val width = size.width
+        val height = size.height
 
-        //Position
-        val params = ConstraintLayout.LayoutParams(width, height)
-
-        //Right
-        params.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-        params.marginEnd = 0
-        //Left
-        params.bottomToTop = R.id.groundView
-        params.bottomMargin = context.dpToPx(-14)
-
-
-
-        cactusImageView.layoutParams = params
-
-        //Choosing sprite according to size
-        val resSprite: Int = when (size) {
-            CactusSizesEnum.Medium -> R.drawable.cactus_medium1
-            CactusSizesEnum.Small -> {
-                val randomIndex = 1 //Change to random at some point
-                when (randomIndex) {
-                    1 -> R.drawable.cactus_small1
-                    2 -> R.drawable.cactus_small2
-                    3 -> R.drawable.cactus_small3
-                    else -> R.drawable.cactus_small4
-                }
-            }
+        // Position à droite de l'écran, aligné au sol
+        val params = ConstraintLayout.LayoutParams(width, height).apply {
+            endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+            marginEnd = 0
+            bottomToTop = R.id.groundView
+            bottomMargin = -(14).dpToPx
         }
-        cactusImageView.setImageResource(resSprite)
+
+        // Configuration du contenu de l'ImageView
+        cactusImageView.layoutParams = params
+        cactusImageView.setImageResource(size.spriteIdList.random())
     }
 
-
-    fun move(){
-        val screenWidth = context.resources.displayMetrics.widthPixels.toFloat()
-
-        cactusImageView.x = screenWidth
-
-        val slideLeft = ObjectAnimator.ofFloat(
+    fun startMoving(startX:Float, targetX:Float) {
+        ObjectAnimator.ofFloat(
             cactusImageView,
             "x",
-            screenWidth,
-            -screenWidth/2
+            startX,
+            targetX
         ).apply {
             interpolator = LinearInterpolator()
-            duration = 1500
+            duration = speed
             start()
-        }.doOnEnd {dropSelf()}
+        }.doOnEnd {
+            dropSelfFromParent()
+        }
     }
-
-    private fun dropSelf(){
-        Tools.removeView(cactusImageView)
+    fun spawn(){
+        // Ajout au layout parent
+        addSelfToParent()
+        x = Tools.screenWidth
+    }
+    private fun dropSelfFromParent() {
+        println("${x}")
+        parentLayout.removeView(cactusImageView)
+    }
+    private fun addSelfToParent() {
+        parentLayout.addView(cactusImageView)
     }
 }
