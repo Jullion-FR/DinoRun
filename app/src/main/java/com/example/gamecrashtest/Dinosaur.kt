@@ -22,8 +22,8 @@ class Dinosaur(private val dinoImageView: ImageView) {
     }
     suspend fun dinoStartingAnimation(){
         dinoImageView.setImageResource(R.drawable.dino_death)
+        delay(300)
         if (!isJumping){
-            delay(300)
             jump(125)
         }
     }
@@ -32,7 +32,7 @@ class Dinosaur(private val dinoImageView: ImageView) {
         if (!isJumping) jump()
     }
 
-    private fun jump(height: Int = 300) {
+    private fun jump(height: Int = 400) {
         isJumping = true
         val baseDinoY = dinoImageView.y
 

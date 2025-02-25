@@ -8,15 +8,16 @@ class CactusGroup(
     private var cactusList: List<Cactus>
 ) {
 
-    fun spawn(){
-        for (cactus: Cactus in cactusList){
+    fun spawn() {
+        var accumulatedOffset = 0f
+
+        cactusList.forEach { cactus ->
             cactus.spawn()
-            for(i in 0..< cactusList.indexOf(cactus)){
-                //cactusList[i] in case of different sizes in group (ex: SmlMedSml)
-                cactus.spriteOffset = cactusList[i].size.width.dpToPx.toFloat()/2
-            }
+            cactus.spriteOffset = accumulatedOffset
+            accumulatedOffset += cactus.size.width.dpToPx.toFloat() / 2 - 20f
         }
     }
+
      fun startMoving(lifecycleScope: LifecycleCoroutineScope) {
         var start:Float
         var target:Float

@@ -9,7 +9,7 @@ import com.example.gamecrashtest.Tools.Companion.dpToPx
 
 class Cactus(
     private val parentLayout: ConstraintLayout,
-    var speed: Long = 2500L,
+    var speed: Long = 1500L,
     val size: CactusSizesEnum = CactusSizesEnum.Small
 ) {
     private val cactusImageView = ImageView(parentLayout.context)

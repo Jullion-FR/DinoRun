@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dino:Dinosaur
     private var score = 0
 
-    var isGameLaunched = false
+    private var isGameLaunched = false
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +75,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val cactusGroupFactory = CactusGroupFactory(mainView)
             while (isActive) {
+                //entries.random()
                 val randomCactusGroup = CactusGroupsEnum.entries.random()
                 println(randomCactusGroup)
                 val cactusGroup = cactusGroupFactory.buildCactusGroup(randomCactusGroup)
@@ -82,7 +83,7 @@ class MainActivity : AppCompatActivity() {
                 cactusGroup.spawn()
                 cactusGroup.startMoving(lifecycleScope)
 
-                delay(5000)
+                delay(3000) //todo faire scale avec le score
             }
         }
     }
