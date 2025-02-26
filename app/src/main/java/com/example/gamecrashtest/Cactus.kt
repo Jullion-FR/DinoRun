@@ -6,6 +6,7 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import com.example.gamecrashtest.Tools.Companion.dpToPx
+import kotlinx.coroutines.delay
 
 class Cactus(
     private val parentLayout: ConstraintLayout,
@@ -14,6 +15,7 @@ class Cactus(
 ) {
     private val cactusImageView = ImageView(parentLayout.context)
     var spriteOffset = 0f
+    var isActive = false
     var x: Float
         get() = cactusImageView.x
         set(value) {
@@ -52,15 +54,41 @@ class Cactus(
             dropSelfFromParent()
         }
     }
-    fun spawn(){
+    fun spawn(xPos: Float = Tools.screenWidth){
         // Ajout au layout parent
         addSelfToParent()
-        x = Tools.screenWidth
+        x = xPos
     }
     private fun dropSelfFromParent() {
         parentLayout.removeView(cactusImageView)
+        isActive = false
     }
     private fun addSelfToParent() {
         parentLayout.addView(cactusImageView)
+        isActive = true
+    }
+
+
+    suspend fun collisionChecker(dinosaur: Dinosaur){
+        val dino = dinosaur.dinoImageView
+        val errorMargin = 10f
+
+        val minX = 0f
+        val maxX = dino.x + dino.width + errorMargin
+
+        var dinoBaseY:Float
+        val cactusTopY = cactusImageView.y - errorMargin
+
+        while (isActive){
+            dinoBaseY = dino.y + dino.translationY
+            //if the cactus is possibly in contact with Dino
+            if(x in minX..maxX){
+                //if Y of dino's base > Y of cactus' top
+                if(dinoBaseY > cactusTopY){
+                    println("In")
+                }
+            }
+            delay(200)
+        }
     }
 }

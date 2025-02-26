@@ -52,6 +52,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun touchScreenResponse() {
+        lifecycleScope.launch {
+            //cactusTest()
+        }
         if (!isGameLaunched) {
             isGameLaunched = true
             lifecycleScope.launch {
@@ -70,6 +73,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private suspend fun cactusTest(){
+        val cactusGroupFactory = CactusGroupFactory(mainView)
+        val cactus = cactusGroupFactory.buildCactus()
+        cactus.spawn()
+        lifecycleScope.launch {
+            cactus.collisionChecker(dino)
+        }
+        lifecycleScope.launch {
+            val start = cactus.x + cactus.spriteOffset
+            val target = cactus.spriteOffset - cactus.x
+
+            cactus.startMoving(
+                start,
+                target
+            )        }
+    }
 
     private fun cactusSpawner() {
         lifecycleScope.launch {
@@ -77,11 +96,11 @@ class MainActivity : AppCompatActivity() {
             while (isActive) {
                 //entries.random()
                 val randomCactusGroup = CactusGroupsEnum.entries.random()
-                println(randomCactusGroup)
                 val cactusGroup = cactusGroupFactory.buildCactusGroup(randomCactusGroup)
 
                 cactusGroup.spawn()
                 cactusGroup.startMoving(lifecycleScope)
+                cactusGroup.collisionChecker(lifecycleScope, dino)
 
                 delay(3000) //todo faire scale avec le score
             }

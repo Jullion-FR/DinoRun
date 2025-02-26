@@ -14,7 +14,7 @@ class CactusGroup(
         cactusList.forEach { cactus ->
             cactus.spawn()
             cactus.spriteOffset = accumulatedOffset
-            accumulatedOffset += cactus.size.width.dpToPx.toFloat() / 2 - 20f
+            accumulatedOffset += cactus.size.width.dpToPx.toFloat() / 3
         }
     }
 
@@ -33,4 +33,13 @@ class CactusGroup(
             }
         }
     }
+
+    fun collisionChecker(lifecycleScope: LifecycleCoroutineScope, dinosaur: Dinosaur){
+        for (cactus: Cactus in cactusList) {
+            lifecycleScope.launch {
+                cactus.collisionChecker(dinosaur)
+            }
+        }
+    }
+
 }

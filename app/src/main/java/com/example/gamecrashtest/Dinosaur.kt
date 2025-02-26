@@ -8,10 +8,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
-class Dinosaur(private val dinoImageView: ImageView) {
+class Dinosaur(val dinoImageView: ImageView) {
     private var isJumping = false
-    //private var baseDinoY:Float
-
+    var x: Float
+        get() = dinoImageView.x
+        set(value) {
+            dinoImageView.x = value
+        }
     private val runningSprites = listOf(
         R.drawable.dino_run1,
         R.drawable.dino_run2
@@ -61,7 +64,7 @@ class Dinosaur(private val dinoImageView: ImageView) {
             index = (index + 1) % runningSprites.size
             delay(75)
         }
-    }.flowOn(Dispatchers.Default) // Exécuter sur un thread différent de la UI
+    }.flowOn(Dispatchers.Default)
 
     suspend fun startSpriteCycle() {
         spriteFlow().collect { sprite ->
