@@ -9,12 +9,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.gamecrashtest.Tools.Companion.initScreenWidth
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
+    companion object{
+        var isGameRunning = false
+    }
 
     private lateinit var mainView:ConstraintLayout
     private lateinit var groundView:View
@@ -52,20 +56,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun touchScreenResponse() {
-        lifecycleScope.launch {
-            //cactusTest()
-        }
+        if(!isGameRunning && isGameLaunched) return
+
         if (!isGameLaunched) {
             isGameLaunched = true
             lifecycleScope.launch {
                 dino.dinoStartingAnimation()
                 dino.startSpriteCycle()
             }
-            lifecycleScope.launch {
-                delay(3000)
-                cactusSpawner()
-            }
-        } else {
+
+            cactusSpawner()
+            isGameRunning = true
+        }
+
+        else {
             runOnUiThread {
                 dino.touchScreenResponse()
                 addScore(1)
@@ -73,27 +77,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun cactusTest(){
-        val cactusGroupFactory = CactusGroupFactory(mainView)
-        val cactus = cactusGroupFactory.buildCactus()
-        cactus.spawn()
-        lifecycleScope.launch {
-            cactus.collisionChecker(dino)
-        }
-        lifecycleScope.launch {
-            val start = cactus.x + cactus.spriteOffset
-            val target = cactus.spriteOffset - cactus.x
-
-            cactus.startMoving(
-                start,
-                target
-            )        }
-    }
-
     private fun cactusSpawner() {
-        lifecycleScope.launch {
+        lifecycleScope.launch{
+            delay(3000)
             val cactusGroupFactory = CactusGroupFactory(mainView)
-            while (isActive) {
+            while (isActive && isGameRunning) {
+
                 //entries.random()
                 val randomCactusGroup = CactusGroupsEnum.entries.random()
                 val cactusGroup = cactusGroupFactory.buildCactusGroup(randomCactusGroup)
@@ -101,8 +90,7 @@ class MainActivity : AppCompatActivity() {
                 cactusGroup.spawn()
                 cactusGroup.startMoving(lifecycleScope)
                 cactusGroup.collisionChecker(lifecycleScope, dino)
-
-                delay(3000) //todo faire scale avec le score
+                delay(3000)
             }
         }
     }

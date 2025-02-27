@@ -1,8 +1,11 @@
 package com.example.gamecrashtest
 
 import android.animation.ObjectAnimator
+import android.os.Handler
+import android.os.Looper
 import android.widget.ImageView
 import androidx.core.animation.doOnEnd
+import com.example.gamecrashtest.MainActivity.Companion.isGameRunning
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
@@ -10,15 +13,13 @@ import kotlinx.coroutines.flow.flowOn
 
 class Dinosaur(val dinoImageView: ImageView) {
     private var isJumping = false
-    var x: Float
-        get() = dinoImageView.x
-        set(value) {
-            dinoImageView.x = value
-        }
     private val runningSprites = listOf(
         R.drawable.dino_run1,
         R.drawable.dino_run2
     )
+    private var animUp: ObjectAnimator? = null
+    private var animDown: ObjectAnimator? = null
+
 
     init {
         dinoImageView.setImageResource(R.drawable.dino_idle)
@@ -41,25 +42,31 @@ class Dinosaur(val dinoImageView: ImageView) {
 
         dinoImageView.setImageResource(R.drawable.dino_jump)
 
-        val animUp = ObjectAnimator.ofFloat(dinoImageView, "y", baseDinoY, baseDinoY - height)
-        val animDown = ObjectAnimator.ofFloat(dinoImageView, "y", baseDinoY - height, baseDinoY)
+        animUp = ObjectAnimator.ofFloat(dinoImageView, "y", baseDinoY, baseDinoY - height)
+        animDown = ObjectAnimator.ofFloat(dinoImageView, "y", baseDinoY - height, baseDinoY)
 
         val duration: Long = 300
-        animUp.duration = duration
-        animDown.duration = duration
+        animUp?.duration = duration
+        animDown?.duration = duration
 
-        animUp.start()
-        animUp.doOnEnd {
-            animDown.start()
-            animDown.doOnEnd {
+        animUp?.start()
+        animUp?.doOnEnd {
+            animDown?.start()
+            animDown?.doOnEnd {
                 isJumping = false
             }
         }
     }
 
-    private fun spriteFlow() = flow {
+    private fun cancelJump() {
+        Handler(Looper.getMainLooper()).post {
+            animDown?.cancel()
+            animUp?.cancel()        }
+    }
+
+        private fun spriteFlow() = flow {
         var index = 0
-        while (true) {
+        while (isGameRunning) {
             emit(runningSprites[index])
             index = (index + 1) % runningSprites.size
             delay(75)
@@ -71,6 +78,13 @@ class Dinosaur(val dinoImageView: ImageView) {
             if (!isJumping) {
                 dinoImageView.setImageResource(sprite)
             }
+            if (!isGameRunning) return@collect
         }
+    }
+
+    fun deathSequence(){
+        cancelJump()
+        dinoImageView.setImageResource(R.drawable.dino_death)
+        isGameRunning = false
     }
 }

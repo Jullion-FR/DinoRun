@@ -2,6 +2,7 @@ package com.example.gamecrashtest
 
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.example.gamecrashtest.Tools.Companion.dpToPx
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class CactusGroup(
@@ -22,7 +23,7 @@ class CactusGroup(
         var start:Float
         var target:Float
         for (cactus: Cactus in cactusList){
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.Main) {
                 start = cactus.x + cactus.spriteOffset
                 target = cactus.spriteOffset - cactus.x
 
@@ -39,6 +40,12 @@ class CactusGroup(
             lifecycleScope.launch {
                 cactus.collisionChecker(dinosaur)
             }
+        }
+    }
+
+    fun cancelMovement() {
+        for (cactus: Cactus in cactusList) {
+            cactus.cancelMovement()
         }
     }
 
