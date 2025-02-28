@@ -3,6 +3,8 @@ package com.example.gamecrashtest
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.example.gamecrashtest.Tools.Companion.dpToPx
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
 
 class CactusGroup(
@@ -19,26 +21,26 @@ class CactusGroup(
         }
     }
 
-     fun startMoving(lifecycleScope: LifecycleCoroutineScope) {
-        var start:Float
-        var target:Float
-        for (cactus: Cactus in cactusList){
-            lifecycleScope.launch(Dispatchers.Main) {
+    fun startMoving(lifecycleScope: LifecycleCoroutineScope) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            val animationDuration = Cactus.speed
+            var start:Float
+            var target:Float
+            cactusList.forEach { cactus ->
                 start = cactus.x + cactus.spriteOffset
                 target = -Tools.screenWidth/6 + cactus.spriteOffset
-
-                cactus.startMoving(
-                    start,
-                    target
-                )
+                cactus.startMoving(start, target)
             }
+            delay(animationDuration)
         }
     }
 
-    fun collisionChecker(lifecycleScope: LifecycleCoroutineScope, dinosaur: Dinosaur){
-        for (cactus: Cactus in cactusList) {
-            lifecycleScope.launch {
-                cactus.collisionChecker(dinosaur)
+    fun startCollisionCheck(lifecycleScope: LifecycleCoroutineScope, dinosaur: Dinosaur) {
+        lifecycleScope.launch {
+            cactusList.asFlow().collect { cactus ->
+                launch {
+                    cactus.startCollisionCheck(lifecycleScope, dinosaur)
+                }
             }
         }
     }

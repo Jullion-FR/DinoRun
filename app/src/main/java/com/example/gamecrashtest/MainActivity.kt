@@ -92,16 +92,18 @@ class MainActivity : AppCompatActivity() {
 
                 cactusGroup.spawn()
                 cactusGroup.startMoving(lifecycleScope)
-                cactusGroup.collisionChecker(lifecycleScope, dino)
+                cactusGroup.startCollisionCheck(lifecycleScope, dino)
                 delay(3000)
             }
         }
     }
 
-    private fun addScore(scoreToAdd:Int){
-        val scoreRender = scoreTextView
+    private fun addScore(scoreToAdd: Int) {
+        if (scoreToAdd == 0) return
         score += scoreToAdd
-        scoreRender.text = "$score"
+        scoreTextView.post {
+            scoreTextView.text = "$score"
+        }
     }
 
     //TEMP and bad

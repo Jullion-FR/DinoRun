@@ -90,6 +90,5 @@ class Dinosaur(val dinoImageView: ImageView) {
     fun deathSequence(){
         cancelJump()
         dinoImageView.setImageResource(R.drawable.dino_death)
-        isGameRunning = false
     }
 }

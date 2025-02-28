@@ -9,14 +9,28 @@ import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
+import androidx.lifecycle.LifecycleCoroutineScope
+import com.example.gamecrashtest.MainActivity.Companion.isGameRunning
 import com.example.gamecrashtest.Tools.Companion.dpToPx
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 
 class Cactus(
     private val parentLayout: ConstraintLayout,
-    private var speed: Long,
-    val size: CactusSizesEnum
-) {
+    val size: CactusSizesEnum) {
+    companion object {
+        var speed: Long = 1500L
+        var activeCactusList = mutableListOf<Cactus>()
+        fun cancelAll(){
+            activeCactusList.forEach{ cactus ->
+                cactus.cancelMovement()
+            }
+        }
+    }
+
     private val cactusImageView = ImageView(parentLayout.context)
     var spriteOffset = 0f
     var x: Float
@@ -47,8 +61,6 @@ class Cactus(
     }
 
     fun startMoving(startX: Float, targetX: Float) {
-        movementAnimator?.cancel()
-
         movementAnimator = ObjectAnimator.ofFloat(
             cactusImageView,
             "x",
@@ -59,7 +71,7 @@ class Cactus(
             duration = speed
             start()
             doOnEnd {
-                dropSelfFromParent()
+                if(MainActivity.isGameRunning) dropSelfFromParent()
             }
         }
     }
@@ -75,32 +87,54 @@ class Cactus(
         x = xPos
     }
 
-    private fun dropSelfFromParent() {
-        if (MainActivity.isGameRunning) {
-            parentLayout.removeView(cactusImageView)
-        }
-    }
     private fun addSelfToParent() {
+        Cactus.activeCactusList.add(this)
         parentLayout.addView(cactusImageView)
     }
 
-    suspend fun collisionChecker(dinosaur: Dinosaur) {
+    private fun dropSelfFromParent() {
+        Cactus.activeCactusList.remove(this)
+        parentLayout.removeView(cactusImageView)
+    }
+
+    private fun collisionFlow(dinosaur: Dinosaur) = flow {
         val dino = dinosaur.dinoImageView
         val errorMargin = 20f
+
         while (MainActivity.isGameRunning) {
-            delay(5)
-
-            val dinoBaseY = dino.y + dino.height - errorMargin
+            val dinoWidth = dino.width.toFloat()
+            val dinoHeight = dino.height.toFloat()
+            val dinoBaseY = dino.y + dinoHeight - errorMargin
             val cactusTopY = cactusImageView.y
-            val minX = dino.x - errorMargin
-            //(dino.width/2) -> approximation of foot's position
-            val maxX = dino.x + (dino.width/2) + errorMargin
 
-            if (x in minX..maxX && dinoBaseY > cactusTopY) {
-                dinosaur.deathSequence()
+            val minX = dino.x - errorMargin
+            val maxX = dino.x + (dinoWidth * 3 / 4) + errorMargin
+
+            val effectiveDinoBaseY = dinoBaseY - (dinoHeight / 4)
+
+            if (x in minX..maxX && effectiveDinoBaseY > cactusTopY) {
+                emit(true)
                 break
             }
+
+            delay(5)
         }
-        cancelMovement()
+    }.flowOn(Dispatchers.Default)
+
+    fun startCollisionCheck(lifecycleScope: LifecycleCoroutineScope, dinosaur: Dinosaur) {
+        lifecycleScope.launch {
+            collisionFlow(dinosaur).collect { collided ->
+                if (collided){
+                    isGameRunning = false
+                    println("Ouch, it's a cactus")
+                    lifecycleScope.launch {
+                        dinosaur.deathSequence()
+                    }
+                    lifecycleScope.launch {
+                        Cactus.cancelAll()
+                    }
+                }
+            }
+        }
     }
 }
