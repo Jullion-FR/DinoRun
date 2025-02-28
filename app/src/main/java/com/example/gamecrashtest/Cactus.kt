@@ -22,7 +22,7 @@ class Cactus(
     private val parentLayout: ConstraintLayout,
     val size: CactusSizesEnum) {
     companion object {
-        var speed: Long = 1500L
+        var speed: Long = 1375L
     }
 
     private val cactusImageView = ImageView(parentLayout.context)

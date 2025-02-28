@@ -45,7 +45,10 @@ class MainActivity : AppCompatActivity() {
         val params = ConstraintLayout.LayoutParams(1096, 34)
         groundEffect = GroundEffect(mainView, R.drawable.ground, params, speed = 35)
 
-        dino = Dinosaur(findViewById(R.id.dinoImageView))
+        dino = Dinosaur(
+            dinoImageView = findViewById(R.id.dinoImageView),
+            context = this
+        )
 
         val DEFAULT_SCORE = 0
         scoreTextView = findViewById(R.id.scoreTextView)
@@ -103,7 +106,6 @@ class MainActivity : AppCompatActivity() {
                 val randomCactusGroup = CactusGroupsEnum.entries.random()
                 val cactusGroup = cactusGroupFactory.buildCactusGroup(
                     randomCactusGroup,
-                    1800L
                 )
 
                 cactusGroup.spawn()

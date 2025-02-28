@@ -6,12 +6,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 class CactusGroupFactory(
     private val parentLayout: ConstraintLayout,
     ) {
-    fun buildCactus(enum: CactusSizesEnum):Cactus{
-        return Cactus(parentLayout, size = enum)
-    }
+
     fun buildCactusGroup(
         groupsEnum: CactusGroupsEnum,
-        speed: Long = 1500L,
         ): CactusGroup {
         return when (groupsEnum) {
             CactusGroupsEnum.SmlMedSml -> CactusGroup(listOf(
