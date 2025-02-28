@@ -25,7 +25,7 @@ class CactusGroup(
         for (cactus: Cactus in cactusList){
             lifecycleScope.launch(Dispatchers.Main) {
                 start = cactus.x + cactus.spriteOffset
-                target = cactus.spriteOffset - cactus.x
+                target = -Tools.screenWidth/6 + cactus.spriteOffset
 
                 cactus.startMoving(
                     start,
@@ -42,11 +42,4 @@ class CactusGroup(
             }
         }
     }
-
-    fun cancelMovement() {
-        for (cactus: Cactus in cactusList) {
-            cactus.cancelMovement()
-        }
-    }
-
 }

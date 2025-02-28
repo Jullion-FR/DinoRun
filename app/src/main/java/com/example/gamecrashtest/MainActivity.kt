@@ -79,13 +79,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun cactusSpawner() {
         lifecycleScope.launch{
-            delay(3000)
+            delay(2000)
             val cactusGroupFactory = CactusGroupFactory(mainView)
             while (isActive && isGameRunning) {
 
                 //entries.random()
                 val randomCactusGroup = CactusGroupsEnum.entries.random()
-                val cactusGroup = cactusGroupFactory.buildCactusGroup(randomCactusGroup)
+                val cactusGroup = cactusGroupFactory.buildCactusGroup(
+                    randomCactusGroup,
+                    1800L
+                )
 
                 cactusGroup.spawn()
                 cactusGroup.startMoving(lifecycleScope)

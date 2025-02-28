@@ -1,6 +1,8 @@
 package com.example.gamecrashtest
 
 import android.animation.ObjectAnimator
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.view.animation.LinearInterpolator
@@ -12,12 +14,11 @@ import kotlinx.coroutines.delay
 
 class Cactus(
     private val parentLayout: ConstraintLayout,
-    var speed: Long = 1500L,
-    val size: CactusSizesEnum = CactusSizesEnum.Small
+    private var speed: Long,
+    val size: CactusSizesEnum
 ) {
     private val cactusImageView = ImageView(parentLayout.context)
     var spriteOffset = 0f
-    private var isActive = false
     var x: Float
         get() = cactusImageView.x
         set(value) {
@@ -41,6 +42,8 @@ class Cactus(
         // Configuration du contenu de l'ImageView
         cactusImageView.layoutParams = params
         cactusImageView.setImageResource(size.spriteIdList.random())
+
+        cactusImageView.setBackgroundColor(Color.parseColor("#FF5722"))
     }
 
     fun startMoving(startX: Float, targetX: Float) {
@@ -60,7 +63,7 @@ class Cactus(
             }
         }
     }
-    fun cancelMovement() {
+    private fun cancelMovement() {
         Handler(Looper.getMainLooper()).post {
             movementAnimator?.cancel()
         }
@@ -71,40 +74,33 @@ class Cactus(
         addSelfToParent()
         x = xPos
     }
+
     private fun dropSelfFromParent() {
-        parentLayout.removeView(cactusImageView)
-        isActive = false
+        if (MainActivity.isGameRunning) {
+            parentLayout.removeView(cactusImageView)
+        }
     }
     private fun addSelfToParent() {
         parentLayout.addView(cactusImageView)
-        isActive = true
     }
 
-
-    suspend fun collisionChecker(dinosaur: Dinosaur){
+    suspend fun collisionChecker(dinosaur: Dinosaur) {
         val dino = dinosaur.dinoImageView
         val errorMargin = 20f
+        while (MainActivity.isGameRunning) {
+            delay(5)
 
-        val minX = 0f
-        val maxX = dino.x + dino.width + errorMargin
+            val dinoBaseY = dino.y + dino.height - errorMargin
+            val cactusTopY = cactusImageView.y
+            val minX = dino.x - errorMargin
+            //(dino.width/2) -> approximation of foot's position
+            val maxX = dino.x + (dino.width/2) + errorMargin
 
-        var dinoBaseY:Float
-        delay(100)
-        var cactusTopY:Float
-
-        while (isActive && MainActivity.isGameRunning){
-            dinoBaseY = dino.y + dino.height - errorMargin
-            cactusTopY = cactusImageView.y
-
-            //if the cactus is possibly in contact with Dino
-            if(x in minX..maxX){
-                if(dinoBaseY > cactusTopY){
-                    println("$dinoBaseY, $cactusTopY")
-                    cancelMovement()
-                    dinosaur.deathSequence()
-                }
+            if (x in minX..maxX && dinoBaseY > cactusTopY) {
+                dinosaur.deathSequence()
+                break
             }
-            delay(200)
         }
+        cancelMovement()
     }
 }

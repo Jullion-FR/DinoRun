@@ -1,6 +1,7 @@
 package com.example.gamecrashtest
 
 import android.animation.ObjectAnimator
+import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.widget.ImageView
@@ -23,6 +24,7 @@ class Dinosaur(val dinoImageView: ImageView) {
 
     init {
         dinoImageView.setImageResource(R.drawable.dino_idle)
+        dinoImageView.setBackgroundColor(Color.parseColor("#90EE90"))
     }
     suspend fun dinoStartingAnimation(){
         dinoImageView.setImageResource(R.drawable.dino_death)
@@ -61,7 +63,9 @@ class Dinosaur(val dinoImageView: ImageView) {
     private fun cancelJump() {
         Handler(Looper.getMainLooper()).post {
             animDown?.cancel()
-            animUp?.cancel()        }
+            animUp?.cancel()
+            isJumping = false
+        }
     }
 
         private fun spriteFlow() = flow {
@@ -69,13 +73,14 @@ class Dinosaur(val dinoImageView: ImageView) {
         while (isGameRunning) {
             emit(runningSprites[index])
             index = (index + 1) % runningSprites.size
-            delay(75)
+            if(isGameRunning)
+                delay(75)
         }
     }.flowOn(Dispatchers.Default)
 
     suspend fun startSpriteCycle() {
         spriteFlow().collect { sprite ->
-            if (!isJumping) {
+            if (!isJumping && isGameRunning) {
                 dinoImageView.setImageResource(sprite)
             }
             if (!isGameRunning) return@collect
