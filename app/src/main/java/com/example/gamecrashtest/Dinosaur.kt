@@ -67,7 +67,7 @@ class Dinosaur(val dinoImageView: ImageView) {
         }
     }
 
-        private fun spriteFlow() = flow {
+    private fun spriteFlow() = flow {
         var index = 0
         while (isGameRunning) {
             emit(runningSprites[index])
@@ -78,6 +78,7 @@ class Dinosaur(val dinoImageView: ImageView) {
     }.flowOn(Dispatchers.Default)
 
     suspend fun startSpriteCycle() {
+
         spriteFlow().collect { sprite ->
             if (!isJumping && isGameRunning) {
                 dinoImageView.setImageResource(sprite)

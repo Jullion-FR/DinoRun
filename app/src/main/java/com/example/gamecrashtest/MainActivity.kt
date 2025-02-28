@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.gamecrashtest.Tools.Companion.initScreenWidth
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -24,10 +23,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var groundView:View
     private lateinit var scoreTextView:TextView
 
+
     private lateinit var dino:Dinosaur
     private var score = 0
 
     private var isGameLaunched = false
+    private lateinit var groundEffect: GroundEffect
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,11 +36,14 @@ class MainActivity : AppCompatActivity() {
         val layout = R.layout.activity_main
         setContentView(layout)
 
-        hideSystemUI()  //TEMP and bad
+        hideSystemUI()  //TEMP and deprecated
         initScreenWidth(this)
 
         mainView = findViewById(R.id.mainView)
         groundView = findViewById(R.id.groundView)
+
+        val params = ConstraintLayout.LayoutParams(1096, 34)
+        groundEffect = GroundEffect(mainView, R.drawable.ground, params, speed = 35)
 
         dino = Dinosaur(findViewById(R.id.dinoImageView))
 
@@ -59,21 +63,33 @@ class MainActivity : AppCompatActivity() {
         if(!isGameRunning && isGameLaunched) return
 
         if (!isGameLaunched) {
-            isGameLaunched = true
-            lifecycleScope.launch {
-                dino.dinoStartingAnimation()
-                dino.startSpriteCycle()
-            }
-
-            cactusSpawner()
-            isGameRunning = true
+            lauchSequence()
         }
-
         else {
             lifecycleScope.launch {
                 dino.touchScreenResponse()
                 addScore(1)
             }
+        }
+    }
+
+    private fun lauchSequence() {
+        isGameLaunched = true
+
+        lifecycleScope.launch {
+            dino.dinoStartingAnimation()
+            dino.startSpriteCycle()
+        }
+
+        startGroundMovement()
+        cactusSpawner()
+        isGameRunning = true
+    }
+
+    private fun startGroundMovement() {
+        lifecycleScope.launch {
+            delay(1000)
+            groundEffect.start()
         }
     }
 

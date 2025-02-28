@@ -72,11 +72,6 @@ class Cactus(
             }
         }
     }
-    private fun cancelMovement() {
-        Handler(Looper.getMainLooper()).post {
-            movementAnimator?.cancel()
-        }
-    }
 
     fun spawn(xPos: Float = Tools.screenWidth){
         // Ajout au layout parent
@@ -94,7 +89,7 @@ class Cactus(
 
     private fun collisionFlow(dinosaur: Dinosaur) = flow {
         val dino = dinosaur.dinoImageView
-        val errorMargin = 20f
+        val errorMargin = 30f
 
         while (MainActivity.isGameRunning) {
             val dinoWidth = dino.width.toFloat()
@@ -103,7 +98,7 @@ class Cactus(
             val cactusTopY = cactusImageView.y
 
             val minX = dino.x - errorMargin
-            val maxX = dino.x + (dinoWidth * 3 / 4) + errorMargin
+            val maxX = dino.x + (dinoWidth * 3 / 4) - errorMargin/2
 
             val effectiveDinoBaseY = dinoBaseY - (dinoHeight / 4)
 
@@ -122,7 +117,6 @@ class Cactus(
                 if (collided){
                     isGameRunning = false
                     println("Ouch, it's a cactus")
-
                     dinosaur.deathSequence()
                 }
             }
