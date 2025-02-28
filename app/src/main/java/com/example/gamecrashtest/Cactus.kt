@@ -23,12 +23,6 @@ class Cactus(
     val size: CactusSizesEnum) {
     companion object {
         var speed: Long = 1500L
-        var activeCactusList = mutableListOf<Cactus>()
-        fun cancelAll(){
-            activeCactusList.forEach{ cactus ->
-                cactus.cancelMovement()
-            }
-        }
     }
 
     private val cactusImageView = ImageView(parentLayout.context)
@@ -67,6 +61,11 @@ class Cactus(
         ).apply {
             interpolator = LinearInterpolator()
             duration = speed
+            addUpdateListener {
+                if (!MainActivity.isGameRunning) {
+                    cancel()
+                }
+            }
             start()
             doOnEnd {
                 if(MainActivity.isGameRunning) dropSelfFromParent()
@@ -86,12 +85,10 @@ class Cactus(
     }
 
     private fun addSelfToParent() {
-        Cactus.activeCactusList.add(this)
         parentLayout.addView(cactusImageView)
     }
 
     private fun dropSelfFromParent() {
-        Cactus.activeCactusList.remove(this)
         parentLayout.removeView(cactusImageView)
     }
 
@@ -125,12 +122,8 @@ class Cactus(
                 if (collided){
                     isGameRunning = false
                     println("Ouch, it's a cactus")
-                    lifecycleScope.launch {
-                        dinosaur.deathSequence()
-                    }
-                    lifecycleScope.launch {
-                        Cactus.cancelAll()
-                    }
+
+                    dinosaur.deathSequence()
                 }
             }
         }

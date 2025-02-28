@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         else {
-            runOnUiThread {
+            lifecycleScope.launch {
                 dino.touchScreenResponse()
                 addScore(1)
             }

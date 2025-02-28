@@ -22,8 +22,7 @@ class CactusGroup(
     }
 
     fun startMoving(lifecycleScope: LifecycleCoroutineScope) {
-        lifecycleScope.launch(Dispatchers.Main) {
-            val animationDuration = Cactus.speed
+        lifecycleScope.launch {
             var start:Float
             var target:Float
             cactusList.forEach { cactus ->
@@ -31,7 +30,6 @@ class CactusGroup(
                 target = -Tools.screenWidth/6 + cactus.spriteOffset
                 cactus.startMoving(start, target)
             }
-            delay(animationDuration)
         }
     }
 
