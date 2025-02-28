@@ -56,8 +56,6 @@ class Cactus(
         // Configuration du contenu de l'ImageView
         cactusImageView.layoutParams = params
         cactusImageView.setImageResource(size.spriteIdList.random())
-
-        cactusImageView.setBackgroundColor(Color.parseColor("#FF5722"))
     }
 
     fun startMoving(startX: Float, targetX: Float) {

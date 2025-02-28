@@ -24,7 +24,6 @@ class Dinosaur(val dinoImageView: ImageView) {
 
     init {
         dinoImageView.setImageResource(R.drawable.dino_idle)
-        dinoImageView.setBackgroundColor(Color.parseColor("#90EE90"))
     }
     suspend fun dinoStartingAnimation(){
         dinoImageView.setImageResource(R.drawable.dino_death)
