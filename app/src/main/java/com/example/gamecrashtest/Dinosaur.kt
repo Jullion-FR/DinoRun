@@ -2,104 +2,88 @@ package com.example.gamecrashtest
 
 import android.animation.ObjectAnimator
 import android.content.Context
+import android.graphics.ImageDecoder
+import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.Drawable
-import android.os.Handler
-import android.os.Looper
+import android.os.Build
 import android.widget.ImageView
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
-import com.example.gamecrashtest.MainActivity.Companion.isGameRunning
 import kotlinx.coroutines.*
 
 class Dinosaur(private val context: Context, val dinoImageView: ImageView) {
-    private var isJumping = false
-    private val runningSprites = listOf(
-        R.drawable.dino_run1,
-        R.drawable.dino_run2
-    )
+    var isJumping = false
 
-    private val cachedSprites: List<Drawable> = runningSprites.map { res ->
-        ContextCompat.getDrawable(context, res)!!
+    private val deathSprite = ContextCompat.getDrawable(context, R.drawable.dino_death)
+    private val jumpSprite = ContextCompat.getDrawable(context, R.drawable.dino_jump)
+    private val runningSprite: Drawable? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        ImageDecoder.decodeDrawable(
+            ImageDecoder.createSource(context.resources, R.drawable.dino_run)
+        )
+    } else {
+        ContextCompat.getDrawable(context,R.drawable.dino_run1)
     }
 
-    private var animUp: ObjectAnimator? = null
-    private var animDown: ObjectAnimator? = null
-    private var spriteJob: Job? = null
-
-    private val coroutineScope = CoroutineScope(Dispatchers.Main)
-    private val handler = Handler(Looper.getMainLooper())
+    private var animComponent: ObjectAnimator? = null
 
     init {
-        dinoImageView.setImageResource(R.drawable.dino_idle)
+        dinoImageView.setImageDrawable(deathSprite)
+        resetAnimComponent()
     }
 
-    suspend fun dinoStartingAnimation() {
-        dinoImageView.setImageResource(R.drawable.dino_death)
-        delay(300)
-        if (!isJumping) {
-            jump(125)
-        }
-    }
-
-    fun touchScreenResponse() {
-        if (!isJumping) jump()
-    }
-
-    private fun jump(height: Int = 400) {
-        isJumping = true
-        val baseDinoY = dinoImageView.y
-        dinoImageView.setImageResource(R.drawable.dino_jump)
-
-        animUp = ObjectAnimator.ofFloat(dinoImageView, "y", baseDinoY, baseDinoY - height).apply {
-            duration = 300
-        }
-        animDown = ObjectAnimator.ofFloat(dinoImageView, "y", baseDinoY - height, baseDinoY).apply {
-            duration = 300
-        }
-
-        animUp?.start()
-        animUp?.doOnEnd {
-            animDown?.start()
-            animDown?.doOnEnd {
-                isJumping = false
-            }
-        }
-    }
-
-    private fun cancelJump() {
-        handler.post {
-            animDown?.cancel()
-            animUp?.cancel()
-            isJumping = false
-        }
-    }
-
-    fun startSpriteCycle() { //TODO POSE GROS PB POUR LE FRAMERATE ALED
-        spriteJob?.cancel()
-        spriteJob = coroutineScope.launch {
-            var index = 0
-            while (isGameRunning) {
-                if (!isJumping) {
-                    dinoImageView.setImageDrawable(cachedSprites[index])
+    private fun resetAnimComponent(val1: Float? = null, val2: Float? = null) {
+        animComponent = if (val1 != null && val2 != null) {
+            ObjectAnimator.ofFloat(dinoImageView, "y", val1, val2).apply {
+                duration = 300
+                addUpdateListener {
+                    if (!MainActivity.isGameRunning) pause()
                 }
-                index = (index + 1) % cachedSprites.size
-                delay(75)
+            }
+        } else {
+            null
+        }
+    }
+
+    suspend fun startSequence() {
+         dinoImageView.setImageDrawable(deathSprite)
+         delay(300)
+         if (!isJumping) {
+             jump(125)
+         }
+         delay(100)
+         restartRunGIF()
+    }
+
+    fun jump(height: Int = 400) {
+        isJumping = true
+        dinoImageView.setImageDrawable(jumpSprite)
+
+        val baseDinoY = dinoImageView.y
+
+        resetAnimComponent(baseDinoY, baseDinoY - height)
+        animComponent?.start()
+
+        animComponent?.doOnEnd {
+            resetAnimComponent(baseDinoY - height, baseDinoY)
+            animComponent?.start()
+
+            animComponent?.doOnEnd {
+                isJumping = false
+                restartRunGIF()
             }
         }
     }
 
-    private fun stopSpriteCycle() {
-        spriteJob?.cancel()
+    private fun restartRunGIF() {
+        dinoImageView.setImageDrawable(runningSprite)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            (if (runningSprite is AnimatedImageDrawable) runningSprite.start())
+        }
     }
 
-    fun deathSequence() {
-        stopSpriteCycle()
-        killCoroutineScope()
-        cancelJump()
-        dinoImageView.setImageResource(R.drawable.dino_death)
+    fun deathSequence(endX: Float) {
+        dinoImageView.x = endX
+        dinoImageView.setImageDrawable(deathSprite)
     }
 
-    private fun killCoroutineScope() {
-        coroutineScope.cancel()
-    }
 }

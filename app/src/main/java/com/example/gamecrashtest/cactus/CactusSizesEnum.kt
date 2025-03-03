@@ -1,5 +1,6 @@
-package com.example.gamecrashtest
+package com.example.gamecrashtest.cactus
 
+import com.example.gamecrashtest.R
 import com.example.gamecrashtest.Tools.Companion.dpToPx
 
 enum class CactusSizesEnum(widthDp: Int, heightDp: Int, val spriteIdList: List<Int>) {

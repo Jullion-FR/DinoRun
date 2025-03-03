@@ -1,16 +1,16 @@
-package com.example.gamecrashtest
+package com.example.gamecrashtest.cactus
 
 import android.animation.ObjectAnimator
-import android.graphics.Color
-import android.graphics.drawable.Drawable
-import android.os.Handler
-import android.os.Looper
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.lifecycle.LifecycleCoroutineScope
+import com.example.gamecrashtest.Dinosaur
+import com.example.gamecrashtest.MainActivity
 import com.example.gamecrashtest.MainActivity.Companion.isGameRunning
+import com.example.gamecrashtest.R
+import com.example.gamecrashtest.Tools
 import com.example.gamecrashtest.Tools.Companion.dpToPx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -20,12 +20,19 @@ import kotlinx.coroutines.launch
 
 class Cactus(
     private val parentLayout: ConstraintLayout,
-    val size: CactusSizesEnum) {
+    val size: CactusSizesEnum,
+    private val cactusImageView: ImageView
+) {
     companion object {
         var speed: Long = 1375L
+//        private val activeCactusMutableList = mutableListOf<Cactus>()
+//        fun cancelAll() {
+//            activeCactusMutableList.forEach { cactus ->
+//                cactus.cancel()
+//            }
+//        }
     }
 
-    private val cactusImageView = ImageView(parentLayout.context)
     var spriteOffset = 0f
     var x: Float
         get() = cactusImageView.x
@@ -35,11 +42,9 @@ class Cactus(
     private var movementAnimator: ObjectAnimator? = null
 
     init {
-        // Dimensions
         val width = size.width
         val height = size.height
 
-        // Position à droite de l'écran, aligné au sol
         val params = ConstraintLayout.LayoutParams(width, height).apply {
             endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
             marginEnd = 0
@@ -47,9 +52,7 @@ class Cactus(
             bottomMargin = -(14).dpToPx
         }
 
-        // Configuration du contenu de l'ImageView
         cactusImageView.layoutParams = params
-        cactusImageView.setImageResource(size.spriteIdList.random())
     }
 
     fun startMoving(startX: Float, targetX: Float) {
@@ -63,12 +66,12 @@ class Cactus(
             duration = speed
             addUpdateListener {
                 if (!MainActivity.isGameRunning) {
-                    cancel()
+                    pause()
                 }
             }
             start()
             doOnEnd {
-                if(MainActivity.isGameRunning) dropSelfFromParent()
+                dropSelfFromParent()
             }
         }
     }
@@ -85,6 +88,7 @@ class Cactus(
 
     private fun dropSelfFromParent() {
         parentLayout.removeView(cactusImageView)
+        cactusImageView.setImageDrawable(null)
     }
 
     private fun collisionFlow(dinosaur: Dinosaur) = flow {
@@ -106,8 +110,7 @@ class Cactus(
                 emit(true)
                 break
             }
-
-            delay(5)
+            delay(16)
         }
     }.flowOn(Dispatchers.Default)
 
@@ -115,9 +118,12 @@ class Cactus(
         lifecycleScope.launch {
             collisionFlow(dinosaur).collect { collided ->
                 if (collided){
+                    val dinoX = dinosaur.dinoImageView.x
                     isGameRunning = false
-                    println("Ouch, it's a cactus")
-                    dinosaur.deathSequence()
+                    lifecycleScope.launch {
+                        println("Ouch, it's a cactus")
+                        dinosaur.deathSequence(dinoX)
+                    }
                 }
             }
         }

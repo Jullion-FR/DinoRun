@@ -1,5 +1,5 @@
-package com.example.gamecrashtest
-import com.example.gamecrashtest.CactusSizesEnum.*
+package com.example.gamecrashtest.cactus
+import com.example.gamecrashtest.cactus.CactusSizesEnum.*
 enum class CactusGroupsEnum(var groupList: List<CactusSizesEnum>) {
     SmlMedSml(listOf(
         Small,

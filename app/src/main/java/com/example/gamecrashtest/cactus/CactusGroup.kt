@@ -1,9 +1,9 @@
-package com.example.gamecrashtest
+package com.example.gamecrashtest.cactus
 
 import androidx.lifecycle.LifecycleCoroutineScope
+import com.example.gamecrashtest.Dinosaur
+import com.example.gamecrashtest.Tools
 import com.example.gamecrashtest.Tools.Companion.dpToPx
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
 
@@ -13,7 +13,6 @@ class CactusGroup(
 
     fun spawn() {
         var accumulatedOffset = 0f
-
         cactusList.forEach { cactus ->
             cactus.spawn()
             cactus.spriteOffset = accumulatedOffset
@@ -27,7 +26,7 @@ class CactusGroup(
             var target:Float
             cactusList.forEach { cactus ->
                 start = cactus.x + cactus.spriteOffset
-                target = -Tools.screenWidth/6 + cactus.spriteOffset
+                target = -Tools.screenWidth /6 + cactus.spriteOffset
                 cactus.startMoving(start, target)
             }
         }

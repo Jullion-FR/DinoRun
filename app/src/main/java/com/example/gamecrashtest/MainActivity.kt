@@ -1,6 +1,7 @@
 package com.example.gamecrashtest
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
@@ -9,9 +10,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.gamecrashtest.Tools.Companion.initScreenWidth
+import com.example.gamecrashtest.cactus.CactusGroup
+import com.example.gamecrashtest.cactus.CactusGroupFactory
+import com.example.gamecrashtest.cactus.CactusGroupsEnum
+import com.example.gamecrashtest.ground.GroundEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.properties.Delegates
 
 
 class MainActivity : AppCompatActivity() {
@@ -25,18 +31,27 @@ class MainActivity : AppCompatActivity() {
 
 
     private lateinit var dino:Dinosaur
-    private var score = 0
+    private var score by Delegates.notNull<Int>()
 
-    private var isGameLaunched = false
+    private var isGameLaunched by Delegates.notNull<Boolean>()
     private lateinit var groundEffect: GroundEffect
+    private lateinit var context:Context
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val layout = R.layout.activity_main
+
+        val DEFAULT_SCORE = 0
+
+        context = this
+        isGameLaunched = false
+        isGameRunning = false
+        score = DEFAULT_SCORE
+
         setContentView(layout)
 
-        hideSystemUI()  //TEMP and deprecated
+        hideSystemUI()  //deprecated
         initScreenWidth(this)
 
         mainView = findViewById(R.id.mainView)
@@ -50,7 +65,6 @@ class MainActivity : AppCompatActivity() {
             context = this
         )
 
-        val DEFAULT_SCORE = 0
         scoreTextView = findViewById(R.id.scoreTextView)
         scoreTextView.text = "$DEFAULT_SCORE"
 
@@ -63,29 +77,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun touchScreenResponse() {
-        if(!isGameRunning && isGameLaunched) return
-
         if (!isGameLaunched) {
-            lauchSequence()
+            launchSequence()
         }
-        else {
+        else if(isGameRunning && !dino.isJumping){
             lifecycleScope.launch {
-                dino.touchScreenResponse()
+                dino.jump()
                 addScore(1)
             }
         }
     }
 
-    private fun lauchSequence() {
+    private fun launchSequence() {
         isGameLaunched = true
 
         lifecycleScope.launch {
-            dino.dinoStartingAnimation()
-            dino.startSpriteCycle()
+            dino.startSequence()
         }
-
         startGroundMovement()
-        cactusSpawner()
+        startCactusSpawner()
+
         isGameRunning = true
     }
 
@@ -96,15 +107,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun cactusSpawner() {
+    private fun startCactusSpawner() {
         lifecycleScope.launch{
             delay(2000)
-            val cactusGroupFactory = CactusGroupFactory(mainView)
+            val cactusGroupFactory = CactusGroupFactory(context, mainView)
             while (isActive && isGameRunning) {
 
                 //entries.random()
                 val randomCactusGroup = CactusGroupsEnum.entries.random()
-                val cactusGroup = cactusGroupFactory.buildCactusGroup(
+                val cactusGroup: CactusGroup = cactusGroupFactory.buildCactusGroup(
                     randomCactusGroup,
                 )
 
