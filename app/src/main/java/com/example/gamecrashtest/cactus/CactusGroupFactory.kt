@@ -53,17 +53,8 @@ class CactusGroupFactory(
     }
 
     private fun drawableListBySize(sizesEnum: CactusSizesEnum): List<Drawable> {
-        return when (sizesEnum) {
-            CactusSizesEnum.Small -> listOf(
-                ContextCompat.getDrawable(context, R.drawable.cactus_small1)!!,
-                ContextCompat.getDrawable(context, R.drawable.cactus_small2)!!,
-                ContextCompat.getDrawable(context, R.drawable.cactus_small3)!!
-            )
-
-            CactusSizesEnum.Medium -> listOf(
-                ContextCompat.getDrawable(context, R.drawable.cactus_medium1)!!,
-                ContextCompat.getDrawable(context, R.drawable.cactus_medium2)!!,
-            )
+        return sizesEnum.spriteIdList.mapNotNull { spriteId ->
+            ContextCompat.getDrawable(context, spriteId)
         }
     }
 

@@ -2,11 +2,13 @@ package com.example.gamecrashtest
 
 import android.animation.ObjectAnimator
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.ImageDecoder
 import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.widget.ImageView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.*
@@ -27,7 +29,8 @@ class Dinosaur(private val context: Context, val dinoImageView: ImageView) {
     private var animComponent: ObjectAnimator? = null
 
     init {
-        dinoImageView.setImageDrawable(deathSprite)
+        dinoImageView.setImageResource(R.drawable.dino_idle)
+        offsetDinoView()
         resetAnimComponent()
     }
 
@@ -44,14 +47,19 @@ class Dinosaur(private val context: Context, val dinoImageView: ImageView) {
         }
     }
 
+    private fun offsetDinoView() {
+        (dinoImageView.layoutParams as ConstraintLayout.LayoutParams).apply {
+            setMargins(Tools.screenWidth.toInt() / 8, topMargin, rightMargin, bottomMargin)
+            dinoImageView.layoutParams = this
+        }
+    }
+
     suspend fun startSequence() {
          dinoImageView.setImageDrawable(deathSprite)
          delay(300)
          if (!isJumping) {
              jump(125)
          }
-         delay(200)
-         restartRunGIF()
     }
 
     fun jump(height: Int = 400) {
@@ -81,8 +89,7 @@ class Dinosaur(private val context: Context, val dinoImageView: ImageView) {
         }
     }
 
-    fun deathSequence(endX: Float) {
-        dinoImageView.x = endX
+    fun deathSequence() {
         dinoImageView.setImageDrawable(deathSprite)
     }
 

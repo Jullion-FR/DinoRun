@@ -16,15 +16,17 @@ class Tools {
                 Resources.getSystem().displayMetrics
             ).toInt()
 
-        fun removeView(view: View) {
-            val vg = (view.parent) as ViewGroup
-            vg.removeView(view)
-        }
         var screenWidth: Float = 0f
             private set
-        //Required in MainView onCreate()
+        var screenHeight: Float = 0f
+            private set
+
+        //Required in MainActivity's onCreate()
         fun initScreenWidth(context: Context){
             screenWidth = context.resources.displayMetrics.widthPixels.toFloat()
+        }
+        fun initScreenHeight(context: Context){
+            screenHeight = context.resources.displayMetrics.heightPixels.toFloat()
         }
     }
 }

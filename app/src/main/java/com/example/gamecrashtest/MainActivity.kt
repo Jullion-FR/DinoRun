@@ -5,11 +5,13 @@ import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
+import com.example.gamecrashtest.Tools.Companion.initScreenHeight
 import com.example.gamecrashtest.Tools.Companion.initScreenWidth
 import com.example.gamecrashtest.cactus.CactusGroup
 import com.example.gamecrashtest.cactus.CactusGroupFactory
@@ -18,7 +20,6 @@ import com.example.gamecrashtest.ground.GroundEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlin.properties.Delegates
 
 
 class MainActivity : AppCompatActivity() {
@@ -54,6 +55,7 @@ class MainActivity : AppCompatActivity() {
 
         hideSystemUI()  //deprecated
         initScreenWidth(this)
+        initScreenHeight(this)
         setContentView(layout)
 
         scoreTextView = findViewById(R.id.scoreTextView)
@@ -70,7 +72,7 @@ class MainActivity : AppCompatActivity() {
             context = this
         )
 
-        mainView.setOnTouchListener { _, event ->
+        mainView.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 touchScreenResponse()
             }
@@ -78,7 +80,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         replayImageView = findViewById(R.id.replayImageView)
-        replayImageView.setOnTouchListener { _, event ->
+
+        replayImageView.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 println("Restart !")
                 recreate()
@@ -86,7 +89,12 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
+        test()
     }
+    private fun test() {
+
+    }
+
 
     private fun touchScreenResponse() {
         if (!isGameLaunched) {
@@ -94,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         }
         else if(isGameRunning && !dino.isJumping){
             lifecycleScope.launch {
-                dino.jump()
+                dino.jump((Tools.screenHeight*0.4).toInt())
                 addScore(1)
             }
         }

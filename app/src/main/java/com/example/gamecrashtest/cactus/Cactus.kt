@@ -1,6 +1,7 @@
 package com.example.gamecrashtest.cactus
 
 import android.animation.ObjectAnimator
+import android.provider.CalendarContract.Colors
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -24,13 +25,7 @@ class Cactus(
     private val cactusImageView: ImageView
 ) {
     companion object {
-        var speed: Long = 1375L
-//        private val activeCactusMutableList = mutableListOf<Cactus>()
-//        fun cancelAll() {
-//            activeCactusMutableList.forEach { cactus ->
-//                cactus.cancel()
-//            }
-//        }
+        var speed: Long = 1375
     }
 
     var spriteOffset = 0f
@@ -42,18 +37,25 @@ class Cactus(
     private var movementAnimator: ObjectAnimator? = null
 
     init {
+        setupCactus()
+    }
+
+    private fun setupCactus() {
         val width = size.width
         val height = size.height
+        println("$width, $height")
 
-        val params = ConstraintLayout.LayoutParams(width, height).apply {
-            endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-            marginEnd = 0
-            bottomToTop = R.id.groundView
-            bottomMargin = -(14).dpToPx
+        val params = ConstraintLayout.LayoutParams(
+            width.toInt(),
+            height.toInt()
+        ).apply {
+                bottomToTop = R.id.groundView
+                bottomMargin = -(14).dpToPx
         }
-
         cactusImageView.layoutParams = params
     }
+
+
 
     fun startMoving(startX: Float, targetX: Float) {
         movementAnimator = ObjectAnimator.ofFloat(
@@ -118,11 +120,10 @@ class Cactus(
         lifecycleScope.launch {
             collisionFlow(dinosaur).collect { collided ->
                 if (collided){
-                    val dinoX = dinosaur.dinoImageView.x
                     isGameRunning = false
                     lifecycleScope.launch {
                         println("Ouch, it's a cactus")
-                        dinosaur.deathSequence(dinoX)
+                        dinosaur.deathSequence()
                     }
                 }
             }

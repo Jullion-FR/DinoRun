@@ -16,7 +16,7 @@ class CactusGroup(
         cactusList.forEach { cactus ->
             cactus.spawn()
             cactus.spriteOffset = accumulatedOffset
-            accumulatedOffset += cactus.size.width.dpToPx.toFloat() / 3
+            accumulatedOffset += cactus.size.width.toFloat()
         }
     }
 
