@@ -50,7 +50,7 @@ class Cactus(
             height.toInt()
         ).apply {
                 bottomToTop = R.id.groundView
-                bottomMargin = -(14).dpToPx
+                //bottomMargin = -(14).dpToPx
         }
         cactusImageView.layoutParams = params
     }

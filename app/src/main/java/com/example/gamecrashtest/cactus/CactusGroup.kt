@@ -26,7 +26,7 @@ class CactusGroup(
             var target:Float
             cactusList.forEach { cactus ->
                 start = cactus.x + cactus.spriteOffset
-                target = -Tools.screenWidth /6 + cactus.spriteOffset
+                target = -Tools.screenWidth / 6 + cactus.spriteOffset
                 cactus.startMoving(start, target)
             }
         }

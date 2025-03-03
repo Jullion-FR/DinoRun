@@ -4,11 +4,12 @@ import com.example.gamecrashtest.R
 import com.example.gamecrashtest.Tools
 
 enum class CactusSizesEnum(val width: Float, val height: Float, val spriteIdList: List<Int>) {
+
     Small(
-        //(100 / 50) = small image dimensions (height, width)
-        // 0.7 is hardcoded -> 0.7/8 of total height
-        (Tools.screenHeight * 0.8 / 8).toFloat(),
-        (Tools.screenHeight * 0.8 / 8 * (100 / 50)).toFloat(),
+        //(50 / 100) = small image dimensions (width, height)
+        // 0.x is hardcoded -> 0.x/8 of total screen width
+        (Tools.screenWidth * 0.35 / 8 ).toFloat(),
+        (Tools.screenWidth * 0.35 / 8 * (50 / 100)).toFloat(),
         listOf(
             R.drawable.cactus_small1,
             R.drawable.cactus_small2,
@@ -17,9 +18,9 @@ enum class CactusSizesEnum(val width: Float, val height: Float, val spriteIdList
     ),
 
     Medium(
-        //(100 / 55) = medium image dimensions (height, width)
-        (Tools.screenHeight * 1.1 / 8).toFloat(),
-        (Tools.screenHeight * 1.1 / 8 * (100 / 55)).toFloat(),
+        //(55 / 100) = medium image dimensions (width, height)
+        (Tools.screenWidth * 0.45 / 8 ).toFloat(),
+        (Tools.screenWidth * 0.45 / 8 * (55 / 100)).toFloat(),
         listOf(
             R.drawable.cactus_medium1,
             R.drawable.cactus_medium2
