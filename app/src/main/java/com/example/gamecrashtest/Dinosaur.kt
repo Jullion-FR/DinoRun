@@ -50,7 +50,7 @@ class Dinosaur(private val context: Context, val dinoImageView: ImageView) {
          if (!isJumping) {
              jump(125)
          }
-         delay(100)
+         delay(200)
          restartRunGIF()
     }
 

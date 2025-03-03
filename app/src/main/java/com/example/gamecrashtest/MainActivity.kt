@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -28,12 +29,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainView:ConstraintLayout
     private lateinit var groundView:View
     private lateinit var scoreTextView:TextView
+    private lateinit var replayImageView: ImageView
 
 
     private lateinit var dino:Dinosaur
-    private var score by Delegates.notNull<Int>()
 
-    private var isGameLaunched by Delegates.notNull<Boolean>()
+    private var score = 0
+    private var isGameLaunched = false
+
     private lateinit var groundEffect: GroundEffect
     private lateinit var context:Context
 
@@ -49,10 +52,12 @@ class MainActivity : AppCompatActivity() {
         isGameRunning = false
         score = DEFAULT_SCORE
 
-        setContentView(layout)
-
         hideSystemUI()  //deprecated
         initScreenWidth(this)
+        setContentView(layout)
+
+        scoreTextView = findViewById(R.id.scoreTextView)
+        scoreTextView.text = "$DEFAULT_SCORE"
 
         mainView = findViewById(R.id.mainView)
         groundView = findViewById(R.id.groundView)
@@ -65,15 +70,22 @@ class MainActivity : AppCompatActivity() {
             context = this
         )
 
-        scoreTextView = findViewById(R.id.scoreTextView)
-        scoreTextView.text = "$DEFAULT_SCORE"
-
         mainView.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 touchScreenResponse()
             }
             true
         }
+
+        replayImageView = findViewById(R.id.replayImageView)
+        replayImageView.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                println("Restart !")
+                recreate()
+            }
+            true
+        }
+
     }
 
     private fun touchScreenResponse() {
@@ -113,7 +125,6 @@ class MainActivity : AppCompatActivity() {
             val cactusGroupFactory = CactusGroupFactory(context, mainView)
             while (isActive && isGameRunning) {
 
-                //entries.random()
                 val randomCactusGroup = CactusGroupsEnum.entries.random()
                 val cactusGroup: CactusGroup = cactusGroupFactory.buildCactusGroup(
                     randomCactusGroup,
