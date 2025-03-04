@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "GameCrashTest"
+rootProject.name = "DinoRun"
 include(":app")
