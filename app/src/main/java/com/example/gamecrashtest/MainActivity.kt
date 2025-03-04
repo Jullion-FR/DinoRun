@@ -20,6 +20,7 @@ import com.example.gamecrashtest.ground.GroundEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.concurrent.timer
 
 
 class MainActivity : AppCompatActivity() {
@@ -35,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var dino:Dinosaur
 
-    private var score = 0
+    private lateinit var score:Score
     private var isGameLaunched = false
 
     private lateinit var groundEffect: GroundEffect
@@ -46,12 +47,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val layout = R.layout.activity_main
 
-        val DEFAULT_SCORE = 0
 
         context = this
         isGameLaunched = false
         isGameRunning = false
-        score = DEFAULT_SCORE
+
 
         hideSystemUI()  //deprecated
         initScreenWidth(this)
@@ -60,13 +60,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(layout)
 
         scoreTextView = findViewById(R.id.scoreTextView)
-        scoreTextView.text = "$DEFAULT_SCORE"
+        score = Score(scoreTextView)
 
         mainView = findViewById(R.id.mainView)
         groundView = findViewById(R.id.groundView)
 
         val params = ConstraintLayout.LayoutParams(1096, 34)
-        groundEffect = GroundEffect(mainView, R.drawable.ground, params, speed = 35)
+        groundEffect = GroundEffect(mainView, R.drawable.ground, params, speed = 30)
 
         dino = Dinosaur(
             dinoImageView = findViewById(R.id.dinoImageView),
@@ -99,38 +99,41 @@ class MainActivity : AppCompatActivity() {
 
     private fun touchScreenResponse() {
         if (!isGameLaunched) {
-            launchSequence()
+            lifecycleScope.launch {
+                launchSequence()
+            }
         }
         else if(isGameRunning && !dino.isJumping){
             lifecycleScope.launch {
                 dino.jump((Tools.screenHeight*0.4).toInt())
-                addScore(1)
             }
         }
     }
 
-    private fun launchSequence() {
+    private suspend fun launchSequence() {
         isGameLaunched = true
 
         lifecycleScope.launch {
             dino.startSequence()
         }
-        startGroundMovement()
-        startCactusSpawner()
 
         isGameRunning = true
+
+        delay(1000)
+        startGroundMovement()
+        score.start()
+        delay(1000)
+        startCactusSpawner()
     }
 
     private fun startGroundMovement() {
         lifecycleScope.launch {
-            delay(1000)
             groundEffect.start()
         }
     }
 
     private fun startCactusSpawner() {
         lifecycleScope.launch{
-            delay(2000)
             val cactusGroupFactory = CactusGroupFactory(context, mainView)
             while (isActive && isGameRunning) {
 
@@ -144,14 +147,6 @@ class MainActivity : AppCompatActivity() {
                 cactusGroup.startCollisionCheck(lifecycleScope, dino)
                 delay(3000)
             }
-        }
-    }
-
-    private fun addScore(scoreToAdd: Int) {
-        if (scoreToAdd == 0) return
-        score += scoreToAdd
-        scoreTextView.post {
-            scoreTextView.text = "$score"
         }
     }
 
