@@ -1,7 +1,7 @@
 package com.example.gamecrashtest.cactus
 
 import android.animation.ObjectAnimator
-import android.provider.CalendarContract.Colors
+import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -12,7 +12,6 @@ import com.example.gamecrashtest.MainActivity
 import com.example.gamecrashtest.MainActivity.Companion.isGameRunning
 import com.example.gamecrashtest.R
 import com.example.gamecrashtest.Tools
-import com.example.gamecrashtest.Tools.Companion.dpToPx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
@@ -22,7 +21,7 @@ import kotlinx.coroutines.launch
 class Cactus(
     private val parentLayout: ConstraintLayout,
     val size: CactusSizesEnum,
-    private val cactusImageView: ImageView
+    private val cactusImageView: ImageView,
 ) {
     companion object {
         var speed: Long = 1375
@@ -36,21 +35,20 @@ class Cactus(
         }
     private var movementAnimator: ObjectAnimator? = null
 
-    init {
-        setupCactus()
-    }
 
-    private fun setupCactus() {
+    private fun setupCactus(anchorView: View?) {
         val width = size.width
         val height = size.height
-        println("$width, $height")
 
         val params = ConstraintLayout.LayoutParams(
-            width.toInt(),
-            height.toInt()
-        ).apply {
-                bottomToTop = R.id.groundView
-                //bottomMargin = -(14).dpToPx
+            width,
+            height
+        )
+        params.apply {
+            bottomToTop = R.id.groundView
+            if (anchorView != null){
+                bottomMargin = -1*anchorView.height/8
+            }
         }
         cactusImageView.layoutParams = params
     }
@@ -78,14 +76,18 @@ class Cactus(
         }
     }
 
-    fun spawn(xPos: Float = Tools.screenWidth){
-        // Ajout au layout parent
+    fun spawn(
+        anchorView: View? = null,
+        xPos: Float = Tools.screenWidth
+        ){
+        setupCactus(anchorView)
         addSelfToParent()
         x = xPos
     }
 
     private fun addSelfToParent() {
         parentLayout.addView(cactusImageView)
+        cactusImageView.requestLayout()
     }
 
     private fun dropSelfFromParent() {
@@ -95,17 +97,19 @@ class Cactus(
 
     private fun collisionFlow(dinosaur: Dinosaur) = flow {
         val dino = dinosaur.dinoImageView
-        val errorMargin = 30f
+        val dinoWidth = dino.width.toFloat()
+        val dinoHeight = dino.height.toFloat()
+
+        val errorMarginX = dinoWidth/24
+        val errorMarginY = dinoHeight/24
 
         while (MainActivity.isGameRunning) {
-            val dinoWidth = dino.width.toFloat()
-            val dinoHeight = dino.height.toFloat()
-            val dinoBaseY = dino.y + dinoHeight - errorMargin
+
+            val minX = dino.x - errorMarginX
+            val maxX = dino.x + (dinoWidth * 3 / 4) - errorMarginX
+
+            val dinoBaseY = dino.y + dinoHeight - errorMarginY
             val cactusTopY = cactusImageView.y
-
-            val minX = dino.x - errorMargin
-            val maxX = dino.x + (dinoWidth * 3 / 4) - errorMargin/2
-
             val effectiveDinoBaseY = dinoBaseY - (dinoHeight / 4)
 
             if (x in minX..maxX && effectiveDinoBaseY > cactusTopY) {

@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +15,7 @@ import com.example.gamecrashtest.Tools.Companion.initScreenWidth
 import com.example.gamecrashtest.cactus.CactusGroup
 import com.example.gamecrashtest.cactus.CactusGroupFactory
 import com.example.gamecrashtest.cactus.CactusGroupsEnum
+import com.example.gamecrashtest.cactus.CactusSizesEnum
 import com.example.gamecrashtest.ground.GroundEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -56,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         hideSystemUI()  //deprecated
         initScreenWidth(this)
         initScreenHeight(this)
+        CactusSizesEnum.entries.forEach { it.updateSizes(Tools.screenWidth) }
         setContentView(layout)
 
         scoreTextView = findViewById(R.id.scoreTextView)
@@ -72,7 +73,7 @@ class MainActivity : AppCompatActivity() {
             context = this
         )
 
-        mainView.setOnTouchListener { v, event ->
+        mainView.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 touchScreenResponse()
             }
@@ -81,7 +82,7 @@ class MainActivity : AppCompatActivity() {
 
         replayImageView = findViewById(R.id.replayImageView)
 
-        replayImageView.setOnTouchListener { v, event ->
+        replayImageView.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 println("Restart !")
                 recreate()
@@ -138,7 +139,7 @@ class MainActivity : AppCompatActivity() {
                     randomCactusGroup,
                 )
 
-                cactusGroup.spawn()
+                cactusGroup.spawn(groundView)
                 cactusGroup.startMoving(lifecycleScope)
                 cactusGroup.startCollisionCheck(lifecycleScope, dino)
                 delay(3000)

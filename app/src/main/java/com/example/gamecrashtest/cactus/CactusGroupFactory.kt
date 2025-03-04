@@ -1,6 +1,7 @@
 package com.example.gamecrashtest.cactus
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import com.example.gamecrashtest.cactus.CactusSizesEnum.*
@@ -64,6 +65,7 @@ class CactusGroupFactory(
             Small -> imageView.setImageDrawable(cachedSpritesSmall.random())
             Medium -> imageView.setImageDrawable(cachedSpritesMedium.random())
         }
+        //imageView.setBackgroundColor(Color.CYAN)
         return imageView
     }
 }

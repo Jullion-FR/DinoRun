@@ -9,13 +9,6 @@ import android.view.ViewGroup
 
 class Tools {
     companion object {
-        val Int.dpToPx: Int
-            get() = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                this.toFloat(),
-                Resources.getSystem().displayMetrics
-            ).toInt()
-
         var screenWidth: Float = 0f
             private set
         var screenHeight: Float = 0f
