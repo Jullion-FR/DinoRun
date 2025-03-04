@@ -1,12 +1,12 @@
-package com.example.gamecrashtest.cactus
+package com.jdauvergne.dinorun.cactus
 
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import com.example.gamecrashtest.cactus.CactusSizesEnum.Medium
-import com.example.gamecrashtest.cactus.CactusSizesEnum.Small
+import com.jdauvergne.dinorun.cactus.CactusSizesEnum.Medium
+import com.jdauvergne.dinorun.cactus.CactusSizesEnum.Small
 
 class CactusGroupFactory(
     private val context: Context,

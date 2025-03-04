@@ -1,14 +1,14 @@
-package com.example.gamecrashtest.ground
+package com.jdauvergne.dinorun.ground
 
 import android.graphics.drawable.Drawable
 import android.view.Choreographer
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import com.example.gamecrashtest.MainActivity
-import com.example.gamecrashtest.R
-import com.example.gamecrashtest.Tools
-import com.example.gamecrashtest.cactus.Cactus
+import com.jdauvergne.dinorun.MainActivity
+import com.jdauvergne.dinorun.R
+import com.jdauvergne.dinorun.Tools
+import com.jdauvergne.dinorun.cactus.Cactus
 
 class GroundEffect(
     private val parentView: ConstraintLayout,

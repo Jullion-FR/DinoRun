@@ -1,4 +1,4 @@
-package com.example.gamecrashtest.cactus
+package com.jdauvergne.dinorun.cactus
 
 import android.animation.ObjectAnimator
 import android.view.View
@@ -7,10 +7,10 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.lifecycle.LifecycleCoroutineScope
-import com.example.gamecrashtest.Dinosaur
-import com.example.gamecrashtest.MainActivity.Companion.isGameRunning
-import com.example.gamecrashtest.R
-import com.example.gamecrashtest.Tools
+import com.jdauvergne.dinorun.Dinosaur
+import com.jdauvergne.dinorun.MainActivity.Companion.isGameRunning
+import com.jdauvergne.dinorun.R
+import com.jdauvergne.dinorun.Tools
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow

@@ -1,10 +1,10 @@
-package com.example.gamecrashtest.cactus
+package com.jdauvergne.dinorun.cactus
 
 import android.content.Context
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.example.gamecrashtest.Dinosaur
-import com.example.gamecrashtest.MainActivity
+import com.jdauvergne.dinorun.Dinosaur
+import com.jdauvergne.dinorun.MainActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch

@@ -1,4 +1,4 @@
-package com.example.gamecrashtest.ground
+package com.jdauvergne.dinorun.ground
 
 import android.graphics.drawable.Drawable
 import android.widget.ImageView

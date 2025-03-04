@@ -1,4 +1,4 @@
-package com.example.gamecrashtest
+package com.jdauvergne.dinorun
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -12,11 +12,11 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
-import com.example.gamecrashtest.Tools.Companion.initScreenHeight
-import com.example.gamecrashtest.Tools.Companion.initScreenWidth
-import com.example.gamecrashtest.cactus.CactusSizesEnum
-import com.example.gamecrashtest.cactus.CactusSpawner
-import com.example.gamecrashtest.ground.GroundEffect
+import com.jdauvergne.dinorun.Tools.Companion.initScreenHeight
+import com.jdauvergne.dinorun.Tools.Companion.initScreenWidth
+import com.jdauvergne.dinorun.cactus.CactusSizesEnum
+import com.jdauvergne.dinorun.cactus.CactusSpawner
+import com.jdauvergne.dinorun.ground.GroundEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

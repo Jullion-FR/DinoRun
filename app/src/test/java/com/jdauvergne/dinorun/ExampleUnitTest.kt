@@ -1,4 +1,4 @@
-package com.example.gamecrashtest
+package com.jdauvergne.dinorun
 
 import org.junit.Test
 

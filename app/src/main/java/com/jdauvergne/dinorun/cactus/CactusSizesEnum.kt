@@ -1,6 +1,6 @@
-package com.example.gamecrashtest.cactus
+package com.jdauvergne.dinorun.cactus
 
-import com.example.gamecrashtest.R
+import com.jdauvergne.dinorun.R
 
 enum class CactusSizesEnum(val spriteIdList: List<Int>) {
     Small(

@@ -1,7 +1,7 @@
-package com.example.gamecrashtest
+package com.jdauvergne.dinorun
 
 import android.widget.TextView
-import com.example.gamecrashtest.cactus.Cactus
+import com.jdauvergne.dinorun.cactus.Cactus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

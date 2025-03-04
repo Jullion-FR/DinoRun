@@ -1,7 +1,7 @@
-package com.example.gamecrashtest.cactus
+package com.jdauvergne.dinorun.cactus
 
-import com.example.gamecrashtest.cactus.CactusSizesEnum.Medium
-import com.example.gamecrashtest.cactus.CactusSizesEnum.Small
+import com.jdauvergne.dinorun.cactus.CactusSizesEnum.Medium
+import com.jdauvergne.dinorun.cactus.CactusSizesEnum.Small
 
 enum class CactusGroupsEnum(var groupList: List<CactusSizesEnum>) {
     SmlMedSml(

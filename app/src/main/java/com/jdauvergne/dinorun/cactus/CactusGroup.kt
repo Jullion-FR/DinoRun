@@ -1,9 +1,9 @@
-package com.example.gamecrashtest.cactus
+package com.jdauvergne.dinorun.cactus
 
 import android.view.View
 import androidx.lifecycle.LifecycleCoroutineScope
-import com.example.gamecrashtest.Dinosaur
-import com.example.gamecrashtest.Tools
+import com.jdauvergne.dinorun.Dinosaur
+import com.jdauvergne.dinorun.Tools
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
 
