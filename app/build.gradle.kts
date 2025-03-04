@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.gamecrashtest"
+    namespace = "com.jdauvergne.dinorun"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.gamecrashtest"
+        applicationId = "com.jdauvergne.dinorun"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
