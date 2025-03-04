@@ -31,8 +31,8 @@ class CactusGroupFactory(
 
     private fun buildCactus(size: CactusSizesEnum): Cactus {
         return when(size){
-            Small -> Cactus(parentLayout, size = Medium, spritedImageView(Medium))
-            Medium -> Cactus(parentLayout, size = Small, spritedImageView(Small))
+            Small -> Cactus(parentLayout, size = Small, spritedImageView(Small))
+            Medium -> Cactus(parentLayout, size = Medium, spritedImageView(Medium))
         }
     }
 
