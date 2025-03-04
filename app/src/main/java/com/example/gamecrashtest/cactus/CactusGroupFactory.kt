@@ -1,55 +1,38 @@
 package com.example.gamecrashtest.cactus
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
-import com.example.gamecrashtest.cactus.CactusSizesEnum.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import com.example.gamecrashtest.R
+import com.example.gamecrashtest.cactus.CactusSizesEnum.Medium
+import com.example.gamecrashtest.cactus.CactusSizesEnum.Small
 
 class CactusGroupFactory(
     private val context: Context,
     private val parentLayout: ConstraintLayout
-    ) {
+) {
     private val cachedSpritesSmall = drawableListBySize(Small)
     private val cachedSpritesMedium = drawableListBySize(Medium)
 
 
     fun buildCactusGroup(
         groupsEnum: CactusGroupsEnum,
-        ): CactusGroup {
-        return when (groupsEnum) {
-            CactusGroupsEnum.SmlMedSml -> CactusGroup(listOf(
-                Cactus(parentLayout, size = Small, spritedImageView(Small)),
-                Cactus(parentLayout, size = Medium, spritedImageView(Medium)),
-                Cactus(parentLayout, size = Small, spritedImageView(Small))
-            ))
+    ): CactusGroup {
+        val cactusList = mutableListOf<Cactus>()
 
-            CactusGroupsEnum.SmlSmlSml -> CactusGroup(listOf(
-                Cactus(parentLayout, size = Small, spritedImageView(Small)),
-                Cactus(parentLayout, size = Small, spritedImageView(Small)),
-                Cactus(parentLayout, size = Small, spritedImageView(Small))
-            ))
+        groupsEnum.groupList.forEach { size ->
+            cactusList.add(buildCactus(size))
+        }
 
-            CactusGroupsEnum.SmlSml -> CactusGroup(listOf(
-                Cactus(parentLayout, size = Small, spritedImageView(Small)),
-                Cactus(parentLayout, size = Small, spritedImageView(Small))
-            ))
+        return CactusGroup(cactusList)
+    }
 
-            CactusGroupsEnum.MedMed -> CactusGroup(listOf(
-                Cactus(parentLayout, size = Medium, spritedImageView(Medium)),
-                Cactus(parentLayout, size = Medium, spritedImageView(Medium))
-            ))
 
-            CactusGroupsEnum.Sml -> CactusGroup(listOf(
-                Cactus(parentLayout, size = Small, spritedImageView(Small))
-            ))
-
-            CactusGroupsEnum.Med -> CactusGroup(listOf(
-                Cactus(parentLayout, size = Medium, spritedImageView(Medium))
-            ))
+    private fun buildCactus(size: CactusSizesEnum): Cactus {
+        return when(size){
+            Small -> Cactus(parentLayout, size = Medium, spritedImageView(Medium))
+            Medium -> Cactus(parentLayout, size = Small, spritedImageView(Small))
         }
     }
 
@@ -61,7 +44,7 @@ class CactusGroupFactory(
 
     private fun spritedImageView(sizesEnum: CactusSizesEnum): ImageView {
         val imageView = ImageView(context)
-        when(sizesEnum){
+        when (sizesEnum) {
             Small -> imageView.setImageDrawable(cachedSpritesSmall.random())
             Medium -> imageView.setImageDrawable(cachedSpritesMedium.random())
         }

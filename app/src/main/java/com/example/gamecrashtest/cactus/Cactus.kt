@@ -8,7 +8,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.example.gamecrashtest.Dinosaur
-import com.example.gamecrashtest.MainActivity
 import com.example.gamecrashtest.MainActivity.Companion.isGameRunning
 import com.example.gamecrashtest.R
 import com.example.gamecrashtest.Tools
@@ -46,13 +45,12 @@ class Cactus(
         )
         params.apply {
             bottomToTop = R.id.groundView
-            if (anchorView != null){
-                bottomMargin = -(anchorView.height * 1.5/8).toInt()
+            if (anchorView != null) {
+                bottomMargin = -(anchorView.height * 1.5 / 8).toInt()
             }
         }
         cactusImageView.layoutParams = params
     }
-
 
 
     fun startMoving(startX: Float, targetX: Float) {
@@ -65,7 +63,7 @@ class Cactus(
             interpolator = LinearInterpolator()
             duration = speed
             addUpdateListener {
-                if (!MainActivity.isGameRunning) {
+                if (!isGameRunning) {
                     pause()
                 }
             }
@@ -79,7 +77,7 @@ class Cactus(
     fun spawn(
         anchorView: View? = null,
         xPos: Float = Tools.screenWidth
-        ){
+    ) {
         setupCactus(anchorView)
         addSelfToParent()
         x = xPos
@@ -100,10 +98,10 @@ class Cactus(
         val dinoWidth = dino.width.toFloat()
         val dinoHeight = dino.height.toFloat()
 
-        val errorMarginX = dinoWidth/24
-        val errorMarginY = dinoHeight/24
+        val errorMarginX = dinoWidth / 24
+        val errorMarginY = dinoHeight / 24
 
-        while (MainActivity.isGameRunning) {
+        while (isGameRunning) {
 
             val minX = dino.x - errorMarginX
             val maxX = dino.x + (dinoWidth * 3 / 4) - errorMarginX
@@ -123,7 +121,7 @@ class Cactus(
     fun startCollisionCheck(lifecycleScope: LifecycleCoroutineScope, dinosaur: Dinosaur) {
         lifecycleScope.launch {
             collisionFlow(dinosaur).collect { collided ->
-                if (collided){
+                if (collided) {
                     isGameRunning = false
                     lifecycleScope.launch {
                         println("Ouch, it's a cactus")

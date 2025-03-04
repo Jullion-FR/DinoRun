@@ -22,23 +22,23 @@ import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
-    companion object{
+    companion object {
         var isGameRunning = false
     }
 
-    private lateinit var mainView:ConstraintLayout
-    private lateinit var groundView:View
+    private lateinit var mainView: ConstraintLayout
+    private lateinit var groundView: View
     private lateinit var replayImageView: ImageView
 
 
-    private lateinit var dino:Dinosaur
+    private lateinit var dino: Dinosaur
     private lateinit var cactusSpawner: CactusSpawner
 
-    private lateinit var score:Score
+    private lateinit var score: Score
     private var isGameLaunched = false
 
     private lateinit var groundEffect: GroundEffect
-    private lateinit var context:Context
+    private lateinit var context: Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,8 +68,9 @@ class MainActivity : AppCompatActivity() {
 
         initListeners()
     }
+
     @SuppressLint("ClickableViewAccessibility")
-    private fun initListeners(){
+    private fun initListeners() {
         mainView.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 touchScreenResponse()
@@ -85,15 +86,15 @@ class MainActivity : AppCompatActivity() {
             true
         }
     }
+
     private fun touchScreenResponse() {
         if (!isGameLaunched) {
             lifecycleScope.launch {
                 launchSequence()
             }
-        }
-        else if(isGameRunning && !dino.isJumping){
+        } else if (isGameRunning && !dino.isJumping) {
             lifecycleScope.launch {
-                dino.jump((Tools.screenHeight*0.4).toInt())
+                dino.jump((Tools.screenHeight * 0.4).toInt())
             }
         }
     }
@@ -130,7 +131,8 @@ class MainActivity : AppCompatActivity() {
             window.decorView.post {
                 window.insetsController?.let { controller ->
                     controller.hide(WindowInsets.Type.systemBars())
-                    controller.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                    controller.systemBarsBehavior =
+                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                 }
             }
         } else {
@@ -145,7 +147,6 @@ class MainActivity : AppCompatActivity() {
                     )
         }
     }
-
 
 
 }

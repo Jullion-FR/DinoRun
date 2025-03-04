@@ -5,7 +5,6 @@ import com.example.gamecrashtest.cactus.Cactus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -13,9 +12,8 @@ class Score(
     private val scoreTextView: TextView
 ) {
     private val DEFAULT_SCORE = 0
-    var score:Int = DEFAULT_SCORE
-        private set
-    var loopJob:Job? = null
+    private var score: Int = DEFAULT_SCORE
+    private var loopJob: Job? = null
 
     init {
         initScore()
@@ -26,29 +24,26 @@ class Score(
         updateTextView()
     }
 
-    private fun addScore(int: Int){
-        score += int
+    private fun incrementScore() {
+        score += 5
         updateTextView()
     }
 
     private fun updateTextView() {
-        scoreTextView.text = "$score".padStart(5,'0')
+        scoreTextView.text = "$score".padStart(5, '0')
     }
 
-    fun start(){
+    fun start() {
         loopJob?.cancel()
         loopJob = CoroutineScope(Dispatchers.Main).launch {
-            while (MainActivity.isGameRunning){
-                addScore(5)
-                if (score%500 == 0){
+            while (MainActivity.isGameRunning) {
+                incrementScore()
+                if (score % 500 == 0) {
                     Cactus.speed -= 50
                     println("Time to speed up ! : ${Cactus.speed}")
                 }
                 delay(100)
             }
         }
-    }
-    fun stop(){
-        loopJob?.cancel()
     }
 }

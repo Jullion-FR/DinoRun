@@ -25,7 +25,8 @@ class CactusSpawner(
         lifecycleScope.launch {
             while (isActive && MainActivity.isGameRunning) {
                 val randomCactusGroup = CactusGroupsEnum.entries.random()
-                val cactusGroup: CactusGroup = cactusGroupFactory.buildCactusGroup(randomCactusGroup)
+                val cactusGroup: CactusGroup =
+                    cactusGroupFactory.buildCactusGroup(randomCactusGroup)
 
                 cactusGroup.spawn(anchorView)
                 cactusGroup.startMoving(lifecycleScope)

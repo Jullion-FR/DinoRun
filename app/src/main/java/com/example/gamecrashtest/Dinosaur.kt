@@ -2,7 +2,6 @@ package com.example.gamecrashtest
 
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.content.res.Resources
 import android.graphics.ImageDecoder
 import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.Drawable
@@ -11,9 +10,9 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
 
-class Dinosaur(private val context: Context, val dinoImageView: ImageView) {
+class Dinosaur(context: Context, val dinoImageView: ImageView) {
     var isJumping = false
 
     private val deathSprite = ContextCompat.getDrawable(context, R.drawable.dino_death)
@@ -23,7 +22,7 @@ class Dinosaur(private val context: Context, val dinoImageView: ImageView) {
             ImageDecoder.createSource(context.resources, R.drawable.dino_run)
         )
     } else {
-        ContextCompat.getDrawable(context,R.drawable.dino_run1)
+        ContextCompat.getDrawable(context, R.drawable.dino_run1)
     }
 
     private var animComponent: ObjectAnimator? = null
@@ -55,11 +54,11 @@ class Dinosaur(private val context: Context, val dinoImageView: ImageView) {
     }
 
     suspend fun startSequence() {
-         dinoImageView.setImageDrawable(deathSprite)
-         delay(300)
-         if (!isJumping) {
-             jump(125)
-         }
+        dinoImageView.setImageDrawable(deathSprite)
+        delay(300)
+        if (!isJumping) {
+            jump(125)
+        }
     }
 
     fun jump(height: Int = 400) {

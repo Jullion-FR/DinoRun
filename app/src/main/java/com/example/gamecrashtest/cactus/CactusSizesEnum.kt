@@ -25,12 +25,13 @@ enum class CactusSizesEnum(val spriteIdList: List<Int>) {
     fun updateSizes(screenWidth: Float) {
         height = when (this) {
             Small -> {
-                width = (screenWidth * (0.4/8)).toInt()
+                width = (screenWidth * (0.4 / 8)).toInt()
                 // Height / Width of picture
                 (width * (100f / 50f)).toInt()
             }
+
             Medium -> {
-                width = (screenWidth * (0.5/8)).toInt()
+                width = (screenWidth * (0.5 / 8)).toInt()
                 //
                 (width * (100f / 55f)).toInt()
             }

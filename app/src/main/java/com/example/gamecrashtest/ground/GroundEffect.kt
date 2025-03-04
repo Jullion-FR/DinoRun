@@ -21,10 +21,11 @@ class GroundEffect(
     private var isScrolling = false
     private val choreographer = Choreographer.getInstance()
 
-    private val cachedDrawable: Drawable? = ContextCompat.getDrawable(parentView.context, drawableId)
+    private val cachedDrawable: Drawable? =
+        ContextCompat.getDrawable(parentView.context, drawableId)
 
     private val viewPool = GroundViewPool(parentView, cachedDrawable, layoutParams)
-    
+
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
             if (!MainActivity.isGameRunning) {
@@ -37,7 +38,7 @@ class GroundEffect(
                 imageView.x -= (Tools.calculateSpeedPerFrame(
                     Tools.screenWidth,
                     Cactus.speed
-                )*1.25).toInt()
+                ) * 1.25).toInt()
             }
 
             val firstView = imageViews.first()

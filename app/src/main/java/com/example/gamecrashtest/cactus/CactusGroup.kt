@@ -22,8 +22,8 @@ class CactusGroup(
 
     fun startMoving(lifecycleScope: LifecycleCoroutineScope) {
         lifecycleScope.launch {
-            var start:Float
-            var target:Float
+            var start: Float
+            var target: Float
             cactusList.forEach { cactus ->
                 start = cactus.x + cactus.spriteOffset
                 target = -Tools.screenWidth / 6 + cactus.spriteOffset
