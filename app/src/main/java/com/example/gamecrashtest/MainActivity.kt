@@ -12,15 +12,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.gamecrashtest.Tools.Companion.initScreenHeight
 import com.example.gamecrashtest.Tools.Companion.initScreenWidth
-import com.example.gamecrashtest.cactus.CactusGroup
-import com.example.gamecrashtest.cactus.CactusGroupFactory
-import com.example.gamecrashtest.cactus.CactusGroupsEnum
 import com.example.gamecrashtest.cactus.CactusSizesEnum
+import com.example.gamecrashtest.cactus.CactusSpawner
 import com.example.gamecrashtest.ground.GroundEffect
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlin.concurrent.timer
 
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +31,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private lateinit var dino:Dinosaur
+    private lateinit var cactusSpawner: CactusSpawner
 
     private lateinit var score:Score
     private var isGameLaunched = false
@@ -65,8 +62,10 @@ class MainActivity : AppCompatActivity() {
         mainView = findViewById(R.id.mainView)
         groundView = findViewById(R.id.groundView)
 
+        cactusSpawner = CactusSpawner(context, mainView)
+
         val params = ConstraintLayout.LayoutParams(1096, 34)
-        groundEffect = GroundEffect(mainView, R.drawable.ground, params, speed = 30)
+        groundEffect = GroundEffect(mainView, R.drawable.ground, params)
 
         dino = Dinosaur(
             dinoImageView = findViewById(R.id.dinoImageView),
@@ -90,12 +89,8 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        test()
-    }
-    private fun test() {
 
     }
-
 
     private fun touchScreenResponse() {
         if (!isGameLaunched) {
@@ -119,11 +114,11 @@ class MainActivity : AppCompatActivity() {
 
         isGameRunning = true
 
-        delay(1000)
+        delay(1200)
         startGroundMovement()
         score.start()
         delay(1000)
-        startCactusSpawner()
+        cactusSpawner.start(lifecycleScope, groundView, dino)
     }
 
     private fun startGroundMovement() {
@@ -132,23 +127,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun startCactusSpawner() {
-        lifecycleScope.launch{
-            val cactusGroupFactory = CactusGroupFactory(context, mainView)
-            while (isActive && isGameRunning) {
-
-                val randomCactusGroup = CactusGroupsEnum.entries.random()
-                val cactusGroup: CactusGroup = cactusGroupFactory.buildCactusGroup(
-                    randomCactusGroup,
-                )
-
-                cactusGroup.spawn(groundView)
-                cactusGroup.startMoving(lifecycleScope)
-                cactusGroup.startCollisionCheck(lifecycleScope, dino)
-                delay(3000)
-            }
-        }
-    }
 
     //TEMP and bad
     private fun hideSystemUI() {

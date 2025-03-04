@@ -47,7 +47,7 @@ class Cactus(
         params.apply {
             bottomToTop = R.id.groundView
             if (anchorView != null){
-                bottomMargin = -1*anchorView.height/8
+                bottomMargin = -(anchorView.height * 1.5/8).toInt()
             }
         }
         cactusImageView.layoutParams = params

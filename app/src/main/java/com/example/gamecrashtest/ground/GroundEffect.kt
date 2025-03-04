@@ -8,12 +8,12 @@ import androidx.core.content.ContextCompat
 import com.example.gamecrashtest.MainActivity
 import com.example.gamecrashtest.R
 import com.example.gamecrashtest.Tools
+import com.example.gamecrashtest.cactus.Cactus
 
 class GroundEffect(
     private val parentView: ConstraintLayout,
     drawableId: Int,
     private val layoutParams: ConstraintLayout.LayoutParams,
-    private val speed: Int
 ) {
     private val screenWidth = Tools.screenWidth
     private val imageViews = mutableListOf<ImageView>()
@@ -21,11 +21,10 @@ class GroundEffect(
     private var isScrolling = false
     private val choreographer = Choreographer.getInstance()
 
-    // Mise en cache du Drawable
     private val cachedDrawable: Drawable? = ContextCompat.getDrawable(parentView.context, drawableId)
 
     private val viewPool = GroundViewPool(parentView, cachedDrawable, layoutParams)
-
+    
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
             if (!MainActivity.isGameRunning) {
@@ -35,7 +34,10 @@ class GroundEffect(
             }
 
             for (imageView in imageViews) {
-                imageView.x -= speed
+                imageView.x -= (Tools.calculateSpeedPerFrame(
+                    Tools.screenWidth,
+                    Cactus.speed
+                )*1.25).toInt()
             }
 
             val firstView = imageViews.first()

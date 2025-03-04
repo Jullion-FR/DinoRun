@@ -1,10 +1,6 @@
 package com.example.gamecrashtest
 
 import android.content.Context
-import android.content.res.Resources
-import android.util.TypedValue
-import android.view.View
-import android.view.ViewGroup
 
 
 class Tools {
@@ -20,6 +16,11 @@ class Tools {
         }
         fun initScreenHeight(context: Context){
             screenHeight = context.resources.displayMetrics.heightPixels.toFloat()
+        }
+
+        fun calculateSpeedPerFrame(distance: Float, durationMs: Long, frameRate: Float = 60f): Float {
+            //Calculate a px/ms ratio for a movement
+            return (distance / durationMs) * (1000 / frameRate)
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.gamecrashtest
 
 import android.widget.TextView
+import com.example.gamecrashtest.cactus.Cactus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -39,6 +40,10 @@ class Score(
         loopJob = CoroutineScope(Dispatchers.Main).launch {
             while (MainActivity.isGameRunning){
                 addScore(5)
+                if (score%500 == 0){
+                    Cactus.speed -= 50
+                    println("Time to speed up ! : ${Cactus.speed}")
+                }
                 delay(100)
             }
         }
