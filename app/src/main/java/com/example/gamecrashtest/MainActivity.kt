@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mainView:ConstraintLayout
     private lateinit var groundView:View
-    private lateinit var scoreTextView:TextView
     private lateinit var replayImageView: ImageView
 
 
@@ -39,16 +38,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var groundEffect: GroundEffect
     private lateinit var context:Context
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val layout = R.layout.activity_main
 
-
         context = this
         isGameLaunched = false
         isGameRunning = false
-
 
         hideSystemUI()  //deprecated
         initScreenWidth(this)
@@ -56,30 +52,28 @@ class MainActivity : AppCompatActivity() {
         CactusSizesEnum.entries.forEach { it.updateSizes(Tools.screenWidth) }
         setContentView(layout)
 
-        scoreTextView = findViewById(R.id.scoreTextView)
-        score = Score(scoreTextView)
-
         mainView = findViewById(R.id.mainView)
-        groundView = findViewById(R.id.groundView)
-
         cactusSpawner = CactusSpawner(context, mainView)
+
+        groundView = findViewById(R.id.groundView)
+        replayImageView = findViewById(R.id.replayImageView)
+
+        score = Score(findViewById(R.id.scoreTextView))
+        dino = Dinosaur(this, findViewById(R.id.dinoImageView))
 
         val params = ConstraintLayout.LayoutParams(1096, 34)
         groundEffect = GroundEffect(mainView, R.drawable.ground, params)
 
-        dino = Dinosaur(
-            dinoImageView = findViewById(R.id.dinoImageView),
-            context = this
-        )
-
+        initListeners()
+    }
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initListeners(){
         mainView.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 touchScreenResponse()
             }
             true
         }
-
-        replayImageView = findViewById(R.id.replayImageView)
 
         replayImageView.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
@@ -88,10 +82,7 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-
-
     }
-
     private fun touchScreenResponse() {
         if (!isGameLaunched) {
             lifecycleScope.launch {

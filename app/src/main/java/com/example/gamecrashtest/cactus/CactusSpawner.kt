@@ -8,10 +8,11 @@ import com.example.gamecrashtest.MainActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class CactusSpawner(
-    private val context: Context,
-    private val mainView: ConstraintLayout,
+    context: Context,
+    mainView: ConstraintLayout,
 ) {
 
     private val cactusGroupFactory = CactusGroupFactory(context, mainView)
@@ -29,7 +30,7 @@ class CactusSpawner(
                 cactusGroup.spawn(anchorView)
                 cactusGroup.startMoving(lifecycleScope)
                 cactusGroup.startCollisionCheck(lifecycleScope, dino)
-                delay(3000)
+                delay(Random.nextLong(2000, 3500))
             }
         }
     }
