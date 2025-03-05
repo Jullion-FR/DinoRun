@@ -1,7 +1,7 @@
 # Chrome Dino Game, but in Kotlin
 
 The famous Chrome Dino Game, adapted for mobile in Kotlin.
-## APK in /
+## APK in /app/releases/
 Of course Android will block it -> click on "Install anyway"
 
 ## V1 is out, with basic functionalities : 
