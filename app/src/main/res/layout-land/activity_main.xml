@@ -22,8 +22,6 @@
 
     <!-- Dinosaur -->
     <!-- 0.150 is hardcoded but arround 1.2/8 of the screen width-->
-    <!-- Medium cactus = 1/8 of the screen width-->
-    <!-- Small cactus = 0.7/8 of the screen width-->
     <ImageView
         android:id="@+id/dinoImageView"
         android:layout_width="0dp"
