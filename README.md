@@ -11,7 +11,7 @@ Of course Android will block it -> click on "Install anyway"
 
 > It should scale well with devices size !
 
-## Howerver, it lacks :
+## However, it lacks :
 - High score save
 - Proper UI (on start and death)
 
