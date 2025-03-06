@@ -23,7 +23,8 @@ class Cactus(
     private val cactusImageView: ImageView,
 ) {
     companion object {
-        var speed: Long = 1375
+        var DEFAULT_SPEED = 1375L
+        var speed: Long = DEFAULT_SPEED
     }
 
     var spriteOffset = 0f

@@ -19,8 +19,8 @@ class CactusSpawner(
 
     fun start(
         lifecycleScope: androidx.lifecycle.LifecycleCoroutineScope,
-        anchorView: View?,
         dino: Dinosaur,
+        anchorView: View?
     ) {
         lifecycleScope.launch {
             while (isActive && MainActivity.isGameRunning) {

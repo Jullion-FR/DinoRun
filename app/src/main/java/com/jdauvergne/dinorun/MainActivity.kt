@@ -1,5 +1,6 @@
 package com.jdauvergne.dinorun
 
+import ShakeDetector
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
@@ -14,6 +15,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.jdauvergne.dinorun.Tools.Companion.initScreenHeight
 import com.jdauvergne.dinorun.Tools.Companion.initScreenWidth
+import com.jdauvergne.dinorun.cactus.Cactus
 import com.jdauvergne.dinorun.cactus.CactusSizesEnum
 import com.jdauvergne.dinorun.cactus.CactusSpawner
 import com.jdauvergne.dinorun.ground.GroundEffect
@@ -30,28 +32,29 @@ class MainActivity : AppCompatActivity() {
     private lateinit var groundView: View
     private lateinit var replayImageView: ImageView
 
-
     private lateinit var dino: Dinosaur
     private lateinit var cactusSpawner: CactusSpawner
+    private lateinit var groundEffect: GroundEffect
+    private lateinit var shakeDetector: ShakeDetector
 
     private lateinit var score: Score
     private var isGameLaunched = false
 
-    private lateinit var groundEffect: GroundEffect
     private lateinit var context: Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val layout = R.layout.activity_main
+        initScreenWidth(this)
+        initScreenHeight(this)
+        CactusSizesEnum.entries.forEach { it.updateSizes(Tools.screenWidth) }
 
         context = this
         isGameLaunched = false
         isGameRunning = false
+        Cactus.speed = Cactus.DEFAULT_SPEED
 
         hideSystemUI()  //deprecated if API<30
-        initScreenWidth(this)
-        initScreenHeight(this)
-        CactusSizesEnum.entries.forEach { it.updateSizes(Tools.screenWidth) }
         setContentView(layout)
 
         mainView = findViewById(R.id.mainView)
@@ -66,7 +69,24 @@ class MainActivity : AppCompatActivity() {
         val params = ConstraintLayout.LayoutParams(1096, 34)
         groundEffect = GroundEffect(mainView, R.drawable.ground, params)
 
+        shakeDetector = ShakeDetector(context) { dino.jump() }
+
         initListeners()
+    }
+    override fun onResume() {
+        super.onResume()
+        hideSystemUI()
+        if (isGameRunning) {
+            shakeDetector.startListening()
+        }
+    }
+    override fun onPause() {
+        super.onPause()
+        shakeDetector.stopListening()
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        shakeDetector.stopListening()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -92,7 +112,7 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 launchSequence()
             }
-        } else if (isGameRunning && !dino.isJumping) {
+        } else if (isGameRunning) {
             lifecycleScope.launch {
                 dino.jump((Tools.screenHeight * 0.4).toInt())
             }
@@ -108,22 +128,18 @@ class MainActivity : AppCompatActivity() {
 
         isGameRunning = true
 
-        delay(1200)
+        delay(1100)
         startGroundMovement()
         score.start()
+        shakeDetector.startListening()
         delay(1000)
-        cactusSpawner.start(lifecycleScope, groundView, dino)
+        cactusSpawner.start(lifecycleScope, dino, groundView)
     }
 
     private fun startGroundMovement() {
         lifecycleScope.launch {
             groundEffect.start()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hideSystemUI()
     }
 
     private fun hideSystemUI() {

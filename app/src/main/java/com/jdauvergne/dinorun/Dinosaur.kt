@@ -56,12 +56,11 @@ class Dinosaur(context: Context, val dinoImageView: ImageView) {
     suspend fun startSequence() {
         dinoImageView.setImageDrawable(deathSprite)
         delay(300)
-        if (!isJumping) {
-            jump(125)
-        }
+        jump(125)
     }
 
     fun jump(height: Int = 400) {
+        if(isJumping) return
         isJumping = true
         dinoImageView.setImageDrawable(jumpSprite)
 
