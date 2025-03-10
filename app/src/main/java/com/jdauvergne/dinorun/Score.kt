@@ -39,8 +39,8 @@ class Score(
             while (MainActivity.isGameRunning) {
                 incrementScore()
                 if (score % 500 == 0) {
-                    Cactus.speed -= 50
-                    println("Time to speed up ! : ${Cactus.speed}")
+                    MainActivity.gameSpeed -= 50
+                    println("Time to speed up ! : ${MainActivity.gameSpeed}")
                 }
                 delay(100)
             }

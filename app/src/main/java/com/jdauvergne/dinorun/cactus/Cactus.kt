@@ -8,6 +8,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.jdauvergne.dinorun.Dinosaur
+import com.jdauvergne.dinorun.MainActivity.Companion.gameSpeed
 import com.jdauvergne.dinorun.MainActivity.Companion.isGameRunning
 import com.jdauvergne.dinorun.R
 import com.jdauvergne.dinorun.Tools
@@ -22,11 +23,6 @@ class Cactus(
     val size: CactusSizesEnum,
     private val cactusImageView: ImageView,
 ) {
-    companion object {
-        var DEFAULT_SPEED = 1375L
-        var speed: Long = DEFAULT_SPEED
-    }
-
     var spriteOffset = 0f
     var x: Float
         get() = cactusImageView.x
@@ -46,6 +42,7 @@ class Cactus(
         )
         params.apply {
             bottomToTop = R.id.groundView
+            startToStart = ConstraintLayout.LayoutParams.PARENT_ID
             if (anchorView != null) {
                 bottomMargin = -(anchorView.height * 1.5 / 8).toInt()
             }
@@ -62,7 +59,7 @@ class Cactus(
             targetX
         ).apply {
             interpolator = LinearInterpolator()
-            duration = speed
+            duration = gameSpeed
             addUpdateListener {
                 if (!isGameRunning) {
                     pause()

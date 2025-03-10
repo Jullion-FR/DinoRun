@@ -15,7 +15,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.jdauvergne.dinorun.Tools.Companion.initScreenHeight
 import com.jdauvergne.dinorun.Tools.Companion.initScreenWidth
-import com.jdauvergne.dinorun.cactus.Cactus
 import com.jdauvergne.dinorun.cactus.CactusSizesEnum
 import com.jdauvergne.dinorun.cactus.CactusSpawner
 import com.jdauvergne.dinorun.ground.GroundEffect
@@ -26,6 +25,8 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     companion object {
         var isGameRunning = false
+        var DEFAULT_SPEED = 2500L
+        var gameSpeed: Long = DEFAULT_SPEED
     }
 
     private lateinit var mainView: ConstraintLayout
@@ -52,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         context = this
         isGameLaunched = false
         isGameRunning = false
-        Cactus.speed = Cactus.DEFAULT_SPEED
+        gameSpeed = DEFAULT_SPEED
 
         hideSystemUI()  //deprecated if API<30
         setContentView(layout)
@@ -66,8 +67,7 @@ class MainActivity : AppCompatActivity() {
         score = Score(findViewById(R.id.scoreTextView))
         dino = Dinosaur(this, findViewById(R.id.dinoImageView))
 
-        val params = ConstraintLayout.LayoutParams(1096, 34)
-        groundEffect = GroundEffect(mainView, R.drawable.ground, params)
+        groundEffect = GroundEffect(mainView, R.drawable.ground)
 
         shakeDetector = ShakeDetector(context) { dino.jump() }
 
@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startGroundMovement() {
         lifecycleScope.launch {
-            groundEffect.start()
+            groundEffect.startFirstMovementLoop()
         }
     }
 

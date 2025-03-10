@@ -1,97 +1,137 @@
 package com.jdauvergne.dinorun.ground
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.graphics.drawable.Drawable
-import android.view.Choreographer
+import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import com.jdauvergne.dinorun.MainActivity
+import com.jdauvergne.dinorun.MainActivity.Companion.gameSpeed
+import com.jdauvergne.dinorun.MainActivity.Companion.isGameRunning
 import com.jdauvergne.dinorun.R
 import com.jdauvergne.dinorun.Tools
-import com.jdauvergne.dinorun.cactus.Cactus
 
 class GroundEffect(
-    private val parentView: ConstraintLayout,
+    private val parentLayout: ConstraintLayout,
     drawableId: Int,
-    private val layoutParams: ConstraintLayout.LayoutParams,
 ) {
-    private val screenWidth = Tools.screenWidth
-    private val imageViews = mutableListOf<ImageView>()
-    private var imageWidth = 0
-    private var isScrolling = false
-    private val choreographer = Choreographer.getInstance()
+    private val context = parentLayout.context
+    private val cachedGround: Drawable? = ContextCompat.getDrawable(context, drawableId)
+    private lateinit var groundList:List<GroundEffectSplit>
 
-    private val cachedDrawable: Drawable? =
-        ContextCompat.getDrawable(parentView.context, drawableId)
-
-    private val viewPool = GroundViewPool(parentView, cachedDrawable, layoutParams)
-
-    private val frameCallback = object : Choreographer.FrameCallback {
-        override fun doFrame(frameTimeNanos: Long) {
-            if (!MainActivity.isGameRunning) {
-                isScrolling = false
-                choreographer.removeFrameCallback(this)
-                return
-            }
-
-            for (imageView in imageViews) {
-                imageView.x -= (Tools.calculateSpeedPerFrame(
-                    Tools.screenWidth,
-                    Cactus.speed
-                ) * 1.25).toInt()
-            }
-
-            val firstView = imageViews.first()
-            if (firstView.x <= -imageWidth) {
-                val lastView = imageViews.last()
-                imageViews.removeAt(0)
-                viewPool.recycleView(firstView)
-                val newView = viewPool.getView()
-                newView.x = lastView.x + imageWidth
-                imageViews.add(newView)
-            }
-
-            choreographer.postFrameCallback(this)
-        }
-    }
+    private val ratio = 34f / 1096f
+    private val groundWidth = (Tools.screenWidth*1.05).toInt()
+    private val groundHeight = (groundWidth * ratio).toInt()
 
     init {
         initialize()
     }
 
     private fun initialize() {
-        ImageView(parentView.context).apply {
-            setImageDrawable(cachedDrawable)
-            layoutParams = this@GroundEffect.layoutParams
-            parentView.addView(this)
-            post {
-                imageWidth = width
-                parentView.removeView(this)
-                setupInitialImages()
-            }
+        val nb = 2
+        groundList = buildGroundEffectSplit(nb)
+
+
+        var accumulatedOffset = 0f
+        groundList.forEach { groundImageSplit ->
+            groundImageSplit.spriteOffset = accumulatedOffset
+            accumulatedOffset += groundWidth
+            parentLayout.addView(groundImageSplit.groundEffectImageView)
+
+            groundImageSplit.x = groundImageSplit.spriteOffset
         }
     }
 
-    private fun setupInitialImages() {
-        if (imageWidth == 0) return
-
-        val numImages = ((screenWidth / imageWidth) + 3).toInt()
-        repeat(numImages) { i ->
-            val imageView = viewPool.getView()
-            imageView.layoutParams = layoutParams.apply {
-                width = imageWidth
-                endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                topToTop = R.id.groundView
-            }
-            imageView.x = i * imageWidth.toFloat() - imageWidth
-            imageViews.add(imageView)
+    private fun buildGroundEffectSplit(nb:Int): List<GroundEffectSplit> {
+        return List(nb) {
+            GroundEffectSplit(
+                buildImageView()
+            )
         }
     }
 
-    fun start() {
-        if (!isScrolling) {
-            isScrolling = true
-            choreographer.postFrameCallback(frameCallback)
+    private fun buildImageView(): ImageView {
+        val layoutParam = ConstraintLayout.LayoutParams(groundWidth, groundHeight)
+        layoutParam.apply {
+            topToTop = R.id.groundView
+            startToStart = ConstraintLayout.LayoutParams.PARENT_ID
         }
+        val imageView = ImageView(context)
+        imageView.apply {
+            setImageDrawable(cachedGround)
+            x = Tools.screenWidth
+            layoutParams = layoutParam
+        }
+
+        return imageView
+    }
+
+    fun startFirstMovementLoop() {
+        var groundImageView: ImageView
+
+        var animator:ObjectAnimator?
+
+        groundList.forEachIndexed { index, groundImageSplit ->
+            groundImageView = groundImageSplit.groundEffectImageView
+
+            animator  = buildMovementLooper(
+                groundImageView = groundImageView
+            )
+
+//            groundImageView.setBackgroundColor(
+//                when(index){
+//                    0->Color.CYAN
+//                    1->Color.RED
+//                    else -> {Color.GRAY}
+//                }
+//            )
+
+            if(index == 0){
+                animator?.apply {
+                    val propertyValuesHolder = PropertyValuesHolder.ofFloat(
+                        "x", 0f, Tools.globalMaxLeftX * 2)
+                    setValues(propertyValuesHolder)
+
+                    addUpdateListener {
+                        if((target as ImageView).x <= Tools.globalMaxLeftX) {
+                            cancel()
+                            buildMovementLooper(target as ImageView)?.start()
+                        }
+                    }
+                }
+
+            }
+            animator?.start()
+        }
+    }
+
+
+    private fun buildMovementLooper(
+        groundImageView: ImageView,
+    ): ObjectAnimator? {
+        val startX: Float = Tools.screenWidth.toFloat()
+        val targetX: Float = Tools.globalMaxLeftX.toFloat()
+        val movementAnimator: ObjectAnimator
+
+        try {
+            movementAnimator = ObjectAnimator.ofFloat(
+                groundImageView,
+                "x",
+                startX,
+                targetX
+            ).apply {
+                interpolator = LinearInterpolator()
+                duration = gameSpeed
+                repeatCount = ObjectAnimator.INFINITE
+                addUpdateListener {
+                    if (!isGameRunning) pause()
+                }
+            }
+        } catch (e: Exception) {
+            return null
+        }
+
+        return movementAnimator
     }
 }
