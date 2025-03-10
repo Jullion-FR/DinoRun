@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     companion object {
         var isGameRunning = false
-        var DEFAULT_SPEED = 2500L
+        var DEFAULT_SPEED = 2000L //The lower the faster
         var gameSpeed: Long = DEFAULT_SPEED
     }
 
