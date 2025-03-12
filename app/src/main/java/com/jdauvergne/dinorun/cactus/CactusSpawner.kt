@@ -1,38 +1,55 @@
 package com.jdauvergne.dinorun.cactus
 
-import android.content.Context
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.LifecycleOwner
 import com.jdauvergne.dinorun.Dinosaur
-import com.jdauvergne.dinorun.MainActivity
+import com.jdauvergne.dinorun.Tools
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class CactusSpawner(
-    context: Context,
-    mainView: ConstraintLayout,
+    private val parent: ConstraintLayout
 ) {
+    private val context = parent.context
+    private val cactusFactory = CactusFactory(context)
+    private var job: Job? = null
+    private val activeGroupList: MutableList<CactusGroup> = mutableListOf()
 
-    private val cactusGroupFactory = CactusGroupFactory(context, mainView)
+    fun start(dino: Dinosaur, anchorView: View?) {
+        job = CoroutineScope(Dispatchers.Main).launch {
+            val lifecycleOwner = context as LifecycleOwner
+            delay(1000)
+            while (isActive) {
+                val cactusGroup = cactusFactory.buildCactusGroup(CactusGroupsEnum.entries.random())
 
-    fun start(
-        lifecycleScope: androidx.lifecycle.LifecycleCoroutineScope,
-        dino: Dinosaur,
-        anchorView: View?
-    ) {
-        lifecycleScope.launch {
-            while (isActive && MainActivity.isGameRunning) {
-                val randomCactusGroup = CactusGroupsEnum.entries.random()
-                val cactusGroup: CactusGroup =
-                    cactusGroupFactory.buildCactusGroup(randomCactusGroup)
-
-                cactusGroup.spawn(anchorView)
-                cactusGroup.startMoving(lifecycleScope)
-                cactusGroup.startCollisionCheck(lifecycleScope, dino)
-                delay(Random.nextLong(2000, 3500))
+                (cactusGroup as CactusGroup).apply {
+                    initialize(anchorView, Tools.screenWidth)
+                    addSelfTo(parent)
+                    startCollisionCheck(dino)
+                    observeCactusGroup(lifecycleOwner)
+                    startMovement()
+                }
+                delay(Random.nextLong(1500, 2500))
             }
         }
+    }
+
+    private fun CactusGroup.observeCactusGroup(lifecycleOwner: LifecycleOwner) {
+        isMoving.observe(lifecycleOwner) { isActive ->
+            if (isActive) activeGroupList.add(this) else activeGroupList.remove(this)
+        }
+    }
+
+    fun stop(){
+        activeGroupList.forEach { cactusGroup ->
+            cactusGroup.stopCollisionCheck()
+        }
+        job?.cancel()
     }
 }

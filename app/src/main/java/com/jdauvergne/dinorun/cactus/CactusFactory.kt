@@ -3,14 +3,12 @@ package com.jdauvergne.dinorun.cactus
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.jdauvergne.dinorun.cactus.CactusSizesEnum.Medium
 import com.jdauvergne.dinorun.cactus.CactusSizesEnum.Small
 
-class CactusGroupFactory(
+class CactusFactory(
     private val context: Context,
-    private val parentLayout: ConstraintLayout
 ) {
     private val cachedSpritesSmall = drawableListBySize(Small)
     private val cachedSpritesMedium = drawableListBySize(Medium)
@@ -18,21 +16,21 @@ class CactusGroupFactory(
 
     fun buildCactusGroup(
         groupsEnum: CactusGroupsEnum,
-    ): CactusGroup {
-        val cactusList = mutableListOf<Cactus>()
+    ): CactusInterface {
+        val cactusList = mutableListOf<CactusInterface>()
 
         groupsEnum.groupList.forEach { size ->
             cactusList.add(buildCactus(size))
         }
 
-        return CactusGroup(cactusList)
+        return CactusGroup(context, cactusList)
     }
 
 
-    private fun buildCactus(size: CactusSizesEnum): Cactus {
+    fun buildCactus(size: CactusSizesEnum): CactusInterface {
         return when(size){
-            Small -> Cactus(parentLayout, size = Small, spritedImageView(Small))
-            Medium -> Cactus(parentLayout, size = Medium, spritedImageView(Medium))
+            Small -> Cactus(spritedImageView(Small), size = Small)
+            Medium -> Cactus(spritedImageView(Medium), size = Medium)
         }
     }
 

@@ -12,6 +12,8 @@ import android.view.WindowInsetsController
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.jdauvergne.dinorun.Tools.Companion.initScreenHeight
 import com.jdauvergne.dinorun.Tools.Companion.initScreenWidth
@@ -24,14 +26,26 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     companion object {
-        var isGameRunning = false
-        var DEFAULT_SPEED = 2000L //The lower the faster
+        val DEFAULT_SPEED = 2000L //The lower the faster
         var gameSpeed: Long = DEFAULT_SPEED
+
+        private val isGameRunning = MutableLiveData<Boolean>()
+
+
+        fun isGameRunning(): Boolean {
+            return isGameRunning.value ?: false
+        }
+        fun startGame(){
+            isGameRunning.value = true
+        }
+        fun gameOver(){
+            isGameRunning.value = false
+        }
+
     }
 
     private lateinit var mainView: ConstraintLayout
     private lateinit var groundView: View
-    private lateinit var replayImageView: ImageView
 
     private lateinit var dino: Dinosaur
     private lateinit var cactusSpawner: CactusSpawner
@@ -42,27 +56,32 @@ class MainActivity : AppCompatActivity() {
     private var isGameLaunched = false
 
     private lateinit var context: Context
+    private val gameObserver = Observer<Boolean> { isRunning ->
+        if (!isRunning) {
+            onGameOver()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val layout = R.layout.activity_main
+        setContentView(layout)
+
         initScreenWidth(this)
         initScreenHeight(this)
         CactusSizesEnum.entries.forEach { it.updateSizes(Tools.screenWidth) }
 
         context = this
         isGameLaunched = false
-        isGameRunning = false
+
         gameSpeed = DEFAULT_SPEED
 
         hideSystemUI()  //deprecated if API<30
-        setContentView(layout)
 
         mainView = findViewById(R.id.mainView)
-        cactusSpawner = CactusSpawner(context, mainView)
+        cactusSpawner = CactusSpawner(mainView)
 
         groundView = findViewById(R.id.groundView)
-        replayImageView = findViewById(R.id.replayImageView)
 
         score = Score(findViewById(R.id.scoreTextView))
         dino = Dinosaur(this, findViewById(R.id.dinoImageView))
@@ -76,17 +95,17 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         hideSystemUI()
-        if (isGameRunning) {
-            shakeDetector.startListening()
+        if (isGameRunning()) {
+            startAll()
         }
     }
     override fun onPause() {
         super.onPause()
-        shakeDetector.stopListening()
+        stopAll()
     }
     override fun onDestroy() {
         super.onDestroy()
-        shakeDetector.stopListening()
+        stopAll()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -97,14 +116,7 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-
-        replayImageView.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                println("Restart !")
-                recreate()
-            }
-            true
-        }
+        isGameRunning.observe(this, gameObserver)
     }
 
     private fun touchScreenResponse() {
@@ -112,7 +124,7 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 launchSequence()
             }
-        } else if (isGameRunning) {
+        } else if (isGameRunning()) {
             lifecycleScope.launch {
                 dino.jump((Tools.screenHeight * 0.4).toInt())
             }
@@ -121,19 +133,27 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun launchSequence() {
         isGameLaunched = true
+        startGame()
 
-        lifecycleScope.launch {
-            dino.startSequence()
-        }
-
-        isGameRunning = true
-
+        dino.startSequence()
         delay(1100)
         startGroundMovement()
-        score.start()
+        startAll()
+    }
+
+    private fun stopAll(){
+        shakeDetector.stopListening()
+        score.stop()
+        cactusSpawner.stop()
+    }
+    private fun startAll(){
         shakeDetector.startListening()
-        delay(1000)
-        cactusSpawner.start(lifecycleScope, dino, groundView)
+        score.start()
+        cactusSpawner.start(dino, groundView)
+    }
+    private fun onGameOver() {
+        stopAll()
+        isGameRunning.removeObserver(gameObserver)
     }
 
     private fun startGroundMovement() {

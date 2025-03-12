@@ -10,10 +10,13 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class Dinosaur(context: Context, val dinoImageView: ImageView) {
-    var isJumping = false
+    private var isJumping = false
 
     private val deathSprite = ContextCompat.getDrawable(context, R.drawable.dino_death)
     private val jumpSprite = ContextCompat.getDrawable(context, R.drawable.dino_jump)
@@ -25,25 +28,12 @@ class Dinosaur(context: Context, val dinoImageView: ImageView) {
         ContextCompat.getDrawable(context, R.drawable.dino_run1)
     }
 
-    private var animComponent: ObjectAnimator? = null
+    private var objectAnimator: ObjectAnimator? = null
 
     init {
         dinoImageView.setImageResource(R.drawable.dino_idle)
         offsetDinoView()
-        resetAnimComponent()
-    }
-
-    private fun resetAnimComponent(val1: Float? = null, val2: Float? = null) {
-        animComponent = if (val1 != null && val2 != null) {
-            ObjectAnimator.ofFloat(dinoImageView, "y", val1, val2).apply {
-                duration = 300
-                addUpdateListener {
-                    if (!MainActivity.isGameRunning) pause()
-                }
-            }
-        } else {
-            null
-        }
+        objectAnimator = buildObjectAnimator()
     }
 
     private fun offsetDinoView() {
@@ -53,10 +43,12 @@ class Dinosaur(context: Context, val dinoImageView: ImageView) {
         }
     }
 
-    suspend fun startSequence() {
-        dinoImageView.setImageDrawable(deathSprite)
-        delay(300)
-        jump(125)
+     fun startSequence() {
+        CoroutineScope(Dispatchers.Main).launch {
+            dinoImageView.setImageDrawable(deathSprite)
+            delay(300)
+            jump(125)
+        }
     }
 
     fun jump(height: Int = 400) {
@@ -66,17 +58,30 @@ class Dinosaur(context: Context, val dinoImageView: ImageView) {
 
         val baseDinoY = dinoImageView.y
 
-        resetAnimComponent(baseDinoY, baseDinoY - height)
-        animComponent?.start()
+        objectAnimator = buildObjectAnimator(baseDinoY, baseDinoY - height)
+        objectAnimator?.start()
 
-        animComponent?.doOnEnd {
-            resetAnimComponent(baseDinoY - height, baseDinoY)
-            animComponent?.start()
+        objectAnimator?.doOnEnd {
+            objectAnimator = buildObjectAnimator(baseDinoY - height, baseDinoY)
+            objectAnimator?.start()
 
-            animComponent?.doOnEnd {
+            objectAnimator?.doOnEnd {
                 isJumping = false
                 restartRunGIF()
             }
+        }
+    }
+
+    private fun buildObjectAnimator(val1: Float? = null, val2: Float? = null): ObjectAnimator? {
+        return if (val1 != null && val2 != null) {
+            ObjectAnimator.ofFloat(dinoImageView, "y", val1, val2).apply {
+                duration = 300
+                addUpdateListener {
+                    if (!MainActivity.isGameRunning()) pause()
+                }
+            }
+        } else {
+            null
         }
     }
 

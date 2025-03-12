@@ -24,14 +24,14 @@ class ShakeDetector(context: Context, private val onShake: () -> Unit) : SensorE
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        if(!MainActivity.isGameRunning){
+        if(!MainActivity.isGameRunning()){
             stopListening()
             return
         }
 
         val x = event.values[0]
         val y = event.values[1]
-        val z = event.values[2]
+
         //Diagonal detection
         if (abs(y+x)/2 > shakeThreshold) {
             onShake.invoke()

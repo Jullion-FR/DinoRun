@@ -14,7 +14,7 @@ import com.jdauvergne.dinorun.Tools
 
 class GroundEffect(
     private val parentLayout: ConstraintLayout,
-    drawableId: Int,
+    drawableId: Int
 ) {
     private val context = parentLayout.context
     private val cachedGround: Drawable? = ContextCompat.getDrawable(context, drawableId)
@@ -79,14 +79,6 @@ class GroundEffect(
                 groundImageView = groundImageView
             )
 
-//            groundImageView.setBackgroundColor(
-//                when(index){
-//                    0->Color.CYAN
-//                    1->Color.RED
-//                    else -> {Color.GRAY}
-//                }
-//            )
-
             if(index == 0){
                 animator?.apply {
                     val propertyValuesHolder = PropertyValuesHolder.ofFloat(
@@ -125,7 +117,7 @@ class GroundEffect(
                 duration = gameSpeed
                 repeatCount = ObjectAnimator.INFINITE
                 addUpdateListener {
-                    if (!isGameRunning) pause()
+                    if (!isGameRunning()) pause()
                 }
             }
         } catch (e: Exception) {

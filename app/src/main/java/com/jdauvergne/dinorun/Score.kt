@@ -1,7 +1,6 @@
 package com.jdauvergne.dinorun
 
 import android.widget.TextView
-import com.jdauvergne.dinorun.cactus.Cactus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -13,7 +12,7 @@ class Score(
 ) {
     private val DEFAULT_SCORE = 0
     private var score: Int = DEFAULT_SCORE
-    private var loopJob: Job? = null
+    private var job: Job? = null
 
     init {
         initScore()
@@ -34,9 +33,9 @@ class Score(
     }
 
     fun start() {
-        loopJob?.cancel()
-        loopJob = CoroutineScope(Dispatchers.Main).launch {
-            while (MainActivity.isGameRunning) {
+        job?.cancel()
+        job = CoroutineScope(Dispatchers.Main).launch {
+            while (job?.isActive == true) {
                 incrementScore()
                 if (score % 500 == 0) {
                     MainActivity.gameSpeed -= 50
@@ -45,5 +44,8 @@ class Score(
                 delay(100)
             }
         }
+    }
+    fun stop(){
+        job?.cancel()
     }
 }
