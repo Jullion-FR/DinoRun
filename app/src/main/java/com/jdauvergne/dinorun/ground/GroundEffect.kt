@@ -7,8 +7,8 @@ import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import com.jdauvergne.dinorun.MainActivity.Companion.gameSpeed
-import com.jdauvergne.dinorun.MainActivity.Companion.isGameRunning
+import com.jdauvergne.dinorun.display.MainActivity.Companion.gameSpeed
+import com.jdauvergne.dinorun.display.MainActivity.Companion.isGameRunning
 import com.jdauvergne.dinorun.R
 import com.jdauvergne.dinorun.Tools
 
@@ -117,6 +117,7 @@ class GroundEffect(
                 duration = gameSpeed
                 repeatCount = ObjectAnimator.INFINITE
                 addUpdateListener {
+                    if(duration != gameSpeed) duration = gameSpeed
                     if (!isGameRunning()) pause()
                 }
             }

@@ -24,18 +24,16 @@ class CactusSpawner(
     fun start(dino: Dinosaur, anchorView: View?) {
         job = CoroutineScope(Dispatchers.Main).launch {
             val lifecycleOwner = context as LifecycleOwner
-            delay(1000)
+            delay(2000)
             while (isActive) {
-                val cactusGroup = cactusFactory.buildCactusGroup(CactusGroupsEnum.entries.random())
-
-                (cactusGroup as CactusGroup).apply {
+                (cactusFactory.buildCactusGroup(CactusGroupsEnum.entries.random()) as CactusGroup).apply {
                     initialize(anchorView, Tools.screenWidth)
                     addSelfTo(parent)
                     startCollisionCheck(dino)
                     observeCactusGroup(lifecycleOwner)
                     startMovement()
                 }
-                delay(Random.nextLong(1500, 2500))
+                delay(Random.nextLong(1200, 2000))
             }
         }
     }

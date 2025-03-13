@@ -1,6 +1,7 @@
 package com.jdauvergne.dinorun
 
 import android.content.Context
+import android.view.View
 
 
 class Tools {

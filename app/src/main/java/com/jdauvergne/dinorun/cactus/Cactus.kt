@@ -7,12 +7,14 @@ import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
+import androidx.core.animation.doOnStart
 import androidx.lifecycle.MutableLiveData
 import com.jdauvergne.dinorun.Dinosaur
-import com.jdauvergne.dinorun.MainActivity.Companion.gameOver
-import com.jdauvergne.dinorun.MainActivity.Companion.gameSpeed
-import com.jdauvergne.dinorun.MainActivity.Companion.isGameRunning
+import com.jdauvergne.dinorun.display.MainActivity.Companion.gameOver
+import com.jdauvergne.dinorun.display.MainActivity.Companion.gameSpeed
+import com.jdauvergne.dinorun.display.MainActivity.Companion.isGameRunning
 import com.jdauvergne.dinorun.R
+import com.jdauvergne.dinorun.Tools
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -42,23 +44,34 @@ class Cactus(
     override val isMoving = MutableLiveData<Boolean>()
 
     override fun startMovement(startX: Float?, targetX: Float?) {
-        if(startX == null || targetX == null) return
-        movementAnimator = ObjectAnimator.ofFloat(
-            cactusImageView,
-            "x",
-            startX,
-            targetX
-        ).apply {
-            interpolator = LinearInterpolator()
-            duration = gameSpeed
-            addUpdateListener {
-                if (!isGameRunning()) cancel()
+        if (startX == null || targetX == null) return
+
+        val action = {
+            movementAnimator = ObjectAnimator.ofFloat(
+                cactusImageView,
+                "x",
+                startX,
+                targetX
+            ).apply {
+                interpolator = LinearInterpolator()
+                duration = gameSpeed
+                addUpdateListener {
+                    if (!isGameRunning()) pause()
+                }
+                doOnStart {
+                    isMoving.value = true
+                }
+                doOnEnd {
+                    isMoving.value = false
+                }
+                start()
             }
-            isMoving.value = true
-            start()
-            doOnEnd {
-                isMoving.value = false
-            }
+        }
+
+        if (cactusImageView.isAttachedToWindow) {
+            action()
+        } else {
+            cactusImageView.post { action() }
         }
     }
 
@@ -73,17 +86,7 @@ class Cactus(
         x = xPos
     }
 
-    override fun startCollisionCheck(dinosaur: Dinosaur) {
-        job = CoroutineScope(Dispatchers.Main).launch {
-            collisionFlow(dinosaur).collect { collided ->
-                if (collided) {
-                    gameOver()
-                    println("Ouch, it's a cactus")
-                    dinosaur.deathSequence()
-                }
-            }
-        }
-    }
+
 
     override fun stopCollisionCheck(){
         job?.cancel()
@@ -117,7 +120,17 @@ class Cactus(
         }
         return params
     }
-
+    override fun startCollisionCheck(dinosaur: Dinosaur) {
+        job = CoroutineScope(Dispatchers.Main).launch {
+            collisionFlow(dinosaur).collect { collided ->
+                if (collided) {
+                    gameOver()
+                    println("Ouch, it's a cactus")
+                    dinosaur.deathSequence()
+                }
+            }
+        }
+    }
     private fun collisionFlow(dinosaur: Dinosaur) = flow {
         val dino = dinosaur.dinoImageView
         val dinoWidth = dino.width.toFloat()
@@ -127,18 +140,18 @@ class Cactus(
         val errorMarginY = dinoHeight / 24
 
         while (currentCoroutineContext().isActive) {
-            val minX = dino.x - errorMarginX
-            val maxX = dino.x + (dinoWidth * 3 / 4) - errorMarginX
+            val minX = dino.x + errorMarginX
+            val maxX = dino.x + dinoWidth - errorMarginX
 
             val dinoBaseY = dino.y + dinoHeight - errorMarginY
             val cactusTopY = cactusImageView.y
-            val effectiveDinoBaseY = dinoBaseY - (dinoHeight / 4)
 
-            if (x in minX..maxX && effectiveDinoBaseY > cactusTopY) {
+            if (cactusImageView.x in minX..maxX && dinoBaseY >= cactusTopY) {
                 emit(true)
                 break
             }
             delay(16)
         }
     }.flowOn(Dispatchers.Default)
+
 }

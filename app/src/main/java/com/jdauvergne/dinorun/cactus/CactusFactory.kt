@@ -17,13 +17,11 @@ class CactusFactory(
     fun buildCactusGroup(
         groupsEnum: CactusGroupsEnum,
     ): CactusInterface {
-        val cactusList = mutableListOf<CactusInterface>()
-
+        val cactusGroup = CactusGroup(context)
         groupsEnum.groupList.forEach { size ->
-            cactusList.add(buildCactus(size))
+            cactusGroup.add(buildCactus(size))
         }
-
-        return CactusGroup(context, cactusList)
+        return cactusGroup
     }
 
 

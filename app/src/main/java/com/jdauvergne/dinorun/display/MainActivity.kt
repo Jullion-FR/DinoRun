@@ -1,4 +1,4 @@
-package com.jdauvergne.dinorun
+package com.jdauvergne.dinorun.display
 
 import ShakeDetector
 import android.annotation.SuppressLint
@@ -7,14 +7,20 @@ import android.os.Build
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.view.Window
 import android.view.WindowInsets
 import android.view.WindowInsetsController
-import android.widget.ImageView
+import android.view.WindowManager
+
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import com.jdauvergne.dinorun.Dinosaur
+import com.jdauvergne.dinorun.R
+import com.jdauvergne.dinorun.Score
+import com.jdauvergne.dinorun.Tools
 import com.jdauvergne.dinorun.Tools.Companion.initScreenHeight
 import com.jdauvergne.dinorun.Tools.Companion.initScreenWidth
 import com.jdauvergne.dinorun.cactus.CactusSizesEnum
@@ -29,19 +35,15 @@ class MainActivity : AppCompatActivity() {
         val DEFAULT_SPEED = 2000L //The lower the faster
         var gameSpeed: Long = DEFAULT_SPEED
 
-        private val isGameRunning = MutableLiveData<Boolean>()
+        private val isGameRunning = MutableLiveData<Boolean?>()
 
 
         fun isGameRunning(): Boolean {
             return isGameRunning.value ?: false
         }
-        fun startGame(){
-            isGameRunning.value = true
-        }
         fun gameOver(){
             isGameRunning.value = false
         }
-
     }
 
     private lateinit var mainView: ConstraintLayout
@@ -54,17 +56,17 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var score: Score
     private var isGameLaunched = false
+    private lateinit var fullScreenModalDialog: FullScreenModalDialog
 
     private lateinit var context: Context
-    private val gameObserver = Observer<Boolean> { isRunning ->
-        if (!isRunning) {
-            onGameOver()
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val layout = R.layout.activity_main
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        hideSystemUI()  //deprecated if API<30
         setContentView(layout)
 
         initScreenWidth(this)
@@ -73,10 +75,10 @@ class MainActivity : AppCompatActivity() {
 
         context = this
         isGameLaunched = false
+        isGameRunning.value = null
 
         gameSpeed = DEFAULT_SPEED
 
-        hideSystemUI()  //deprecated if API<30
 
         mainView = findViewById(R.id.mainView)
         cactusSpawner = CactusSpawner(mainView)
@@ -90,7 +92,10 @@ class MainActivity : AppCompatActivity() {
 
         shakeDetector = ShakeDetector(context) { dino.jump() }
 
+        fullScreenModalDialog = FullScreenModalDialog(this) { recreate() }
+
         initListeners()
+
     }
     override fun onResume() {
         super.onResume()
@@ -116,7 +121,9 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-        isGameRunning.observe(this, gameObserver)
+        isGameRunning.observe(this as LifecycleOwner){ isRunning ->
+            if (isRunning != null && isRunning == false)  onGameOver()
+        }
     }
 
     private fun touchScreenResponse() {
@@ -131,13 +138,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun launchSequence() {
+    private fun launchSequence() {
         isGameLaunched = true
-        startGame()
+        isGameRunning.value = true
 
-        dino.startSequence()
-        delay(1100)
-        startGroundMovement()
+
         startAll()
     }
 
@@ -147,20 +152,28 @@ class MainActivity : AppCompatActivity() {
         cactusSpawner.stop()
     }
     private fun startAll(){
+        dino.startSequence()
+        startGroundMovement()
+
         shakeDetector.startListening()
         score.start()
         cactusSpawner.start(dino, groundView)
     }
     private fun onGameOver() {
+        isGameRunning.value = null
         stopAll()
-        isGameRunning.removeObserver(gameObserver)
+        window?.decorView?.post {
+            fullScreenModalDialog.show()
+        }
     }
 
     private fun startGroundMovement() {
         lifecycleScope.launch {
+            delay(1075)
             groundEffect.startFirstMovementLoop()
         }
     }
+
 
     private fun hideSystemUI() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -183,6 +196,4 @@ class MainActivity : AppCompatActivity() {
                     )
         }
     }
-
-
 }

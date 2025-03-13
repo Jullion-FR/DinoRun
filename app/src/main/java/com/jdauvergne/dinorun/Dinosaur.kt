@@ -10,6 +10,7 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
+import com.jdauvergne.dinorun.display.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -52,25 +53,38 @@ class Dinosaur(context: Context, val dinoImageView: ImageView) {
     }
 
     fun jump(height: Int = 400) {
-        if(isJumping) return
+        if (isJumping) return
         isJumping = true
+
         dinoImageView.setImageDrawable(jumpSprite)
 
         val baseDinoY = dinoImageView.y
 
-        objectAnimator = buildObjectAnimator(baseDinoY, baseDinoY - height)
-        objectAnimator?.start()
+        val jumpUp = buildObjectAnimator(baseDinoY, baseDinoY - height)
+        val fallDown = buildObjectAnimator(baseDinoY - height, baseDinoY)
 
-        objectAnimator?.doOnEnd {
-            objectAnimator = buildObjectAnimator(baseDinoY - height, baseDinoY)
-            objectAnimator?.start()
+        jumpUp?.apply {
+            addUpdateListener {
+                if(!MainActivity.isGameRunning()) pause()
+            }
+            doOnEnd {
+                fallDown?.start()
+            }
+        }
 
-            objectAnimator?.doOnEnd {
+        fallDown?.apply {
+            addUpdateListener {
+                if(!MainActivity.isGameRunning()) pause()
+            }
+            doOnEnd {
                 isJumping = false
                 restartRunGIF()
             }
         }
+
+        jumpUp?.start()
     }
+
 
     private fun buildObjectAnimator(val1: Float? = null, val2: Float? = null): ObjectAnimator? {
         return if (val1 != null && val2 != null) {

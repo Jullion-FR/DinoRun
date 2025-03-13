@@ -3,9 +3,8 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import com.jdauvergne.dinorun.MainActivity
+import com.jdauvergne.dinorun.display.MainActivity
 import kotlin.math.abs
-import kotlin.math.sqrt
 
 class ShakeDetector(context: Context, private val onShake: () -> Unit) : SensorEventListener {
     private var sensorManager: SensorManager? = null

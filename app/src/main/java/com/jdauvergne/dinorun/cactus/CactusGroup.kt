@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class CactusGroup(
     private val context: Context,
-    private var cactusList: List<CactusInterface>
+    private var cactusList: MutableList<CactusInterface> = mutableListOf()
 ) : CactusInterface {
     override val isMoving = MutableLiveData<Boolean>()
     override val width = cactusList.sumOf { it.width }
@@ -70,6 +70,11 @@ class CactusGroup(
 
     override fun dropSelfFromParent() {
         forEachCactus { it.dropSelfFromParent() }
+    }
+
+    fun add(cactus: CactusInterface, index:Int = -1){
+        if(index < 0 || index > cactusList.size-1) cactusList.add(cactus)
+        else cactusList.add(index, cactus)
     }
 
     private fun CactusInterface.observeCactus(lifecycleOwner: LifecycleOwner) {

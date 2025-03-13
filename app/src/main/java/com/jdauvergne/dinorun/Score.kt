@@ -1,6 +1,7 @@
 package com.jdauvergne.dinorun
 
 import android.widget.TextView
+import com.jdauvergne.dinorun.display.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
