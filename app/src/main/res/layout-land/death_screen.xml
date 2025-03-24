@@ -5,19 +5,19 @@
     android:id="@+id/mainView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#59FFFFFF"
+    android:background="#4DFFFFFF"
     tools:ignore="MissingDefaultResource">
 
     <TextView
         android:id="@+id/gameOverLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="85dp"
         android:layout_marginBottom="24dp"
         android:fontFamily="sans-serif"
         android:text="GAME OVER"
         android:textAlignment="center"
-        android:textColor="#4C4C4C"
+        android:textColor="#D1D1D1"
         android:textSize="60sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/replayImageView"

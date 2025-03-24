@@ -39,7 +39,7 @@ class Cactus(
 
     private var parentLayout: ViewGroup? = null
     private var movementAnimator: ObjectAnimator? = null
-    private var job:Job? = null
+    private var job: Job? = null
 
     override val isMoving = MutableLiveData<Boolean>()
 
@@ -87,8 +87,7 @@ class Cactus(
     }
 
 
-
-    override fun stopCollisionCheck(){
+    override fun stopCollisionCheck() {
         job?.cancel()
     }
 
@@ -120,6 +119,7 @@ class Cactus(
         }
         return params
     }
+
     override fun startCollisionCheck(dinosaur: Dinosaur) {
         job = CoroutineScope(Dispatchers.Main).launch {
             collisionFlow(dinosaur).collect { collided ->
@@ -131,27 +131,30 @@ class Cactus(
             }
         }
     }
+
     private fun collisionFlow(dinosaur: Dinosaur) = flow {
         val dino = dinosaur.dinoImageView
         val dinoWidth = dino.width.toFloat()
         val dinoHeight = dino.height.toFloat()
 
-        val errorMarginX = dinoWidth / 24
-        val errorMarginY = dinoHeight / 24
+        val exclusionMarginX = dinoWidth / 4
+        val exclusionMarginY = dinoHeight / 4
+
+        val errorMarginX = 0 //dinoWidth / 24
+        val errorMarginY = 0 //dinoHeight / 24
 
         while (currentCoroutineContext().isActive) {
             val minX = dino.x + errorMarginX
-            val maxX = dino.x + dinoWidth - errorMarginX
+            val maxX = dino.x + dinoWidth - exclusionMarginX
 
-            val dinoBaseY = dino.y + dinoHeight - errorMarginY
+            val dinoBaseY = dino.y + dinoHeight - exclusionMarginY - errorMarginY
             val cactusTopY = cactusImageView.y
 
-            if (cactusImageView.x in minX..maxX && dinoBaseY >= cactusTopY) {
+            if (x in minX..maxX && dinoBaseY >= cactusTopY) {
                 emit(true)
                 break
             }
-            delay(16)
+            delay(5)
         }
     }.flowOn(Dispatchers.Default)
-
 }

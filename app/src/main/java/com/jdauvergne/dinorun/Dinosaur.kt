@@ -68,7 +68,7 @@ class Dinosaur(context: Context, val dinoImageView: ImageView) {
                 if(!MainActivity.isGameRunning()) pause()
             }
             doOnEnd {
-                fallDown?.start()
+                if (MainActivity.isGameRunning()) fallDown?.start()
             }
         }
 
@@ -78,7 +78,7 @@ class Dinosaur(context: Context, val dinoImageView: ImageView) {
             }
             doOnEnd {
                 isJumping = false
-                restartRunGIF()
+                if (MainActivity.isGameRunning()) restartRunGIF()
             }
         }
 
