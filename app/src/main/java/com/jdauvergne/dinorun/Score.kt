@@ -12,8 +12,9 @@ class Score(
     private val scoreTextView: TextView
 ) {
     private val DEFAULT_SCORE = 0
-    private var score: Int = DEFAULT_SCORE
     private var job: Job? = null
+    var score: Int = DEFAULT_SCORE
+        private set
 
     init {
         initScore()

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/transparent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp"
+    tools:ignore="MissingDefaultResource">
+
+
+<!-- Texte "Game Over" -->
+    <TextView
+        android:id="@+id/tv_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Game Over!"
+        android:textColor="@android:color/white"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- Bouton Image pour Rejouer -->
+    <ImageView
+        android:id="@+id/btn_replay"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/replay"
+    android:contentDescription="Rejouer"
+    android:layout_marginTop="16dp"/>
+</LinearLayout>

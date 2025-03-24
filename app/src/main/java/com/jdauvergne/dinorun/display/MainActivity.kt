@@ -2,15 +2,15 @@ package com.jdauvergne.dinorun.display
 
 import ShakeDetector
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Context
-import android.os.Build
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.Window
-import android.view.WindowInsets
-import android.view.WindowInsetsController
-import android.view.WindowManager
+import android.widget.Button
+import android.widget.TextView
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -21,6 +21,7 @@ import com.jdauvergne.dinorun.Dinosaur
 import com.jdauvergne.dinorun.R
 import com.jdauvergne.dinorun.Score
 import com.jdauvergne.dinorun.Tools
+import com.jdauvergne.dinorun.Tools.Companion.hideSystemUI
 import com.jdauvergne.dinorun.Tools.Companion.initScreenHeight
 import com.jdauvergne.dinorun.Tools.Companion.initScreenWidth
 import com.jdauvergne.dinorun.cactus.CactusSizesEnum
@@ -54,9 +55,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var groundEffect: GroundEffect
     private lateinit var shakeDetector: ShakeDetector
 
-    private lateinit var score: Score
+    private lateinit var scoreManager: Score
     private var isGameLaunched = false
-    private lateinit var fullScreenModalDialog: FullScreenModalDialog
 
     private lateinit var context: Context
 
@@ -64,9 +64,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val layout = R.layout.activity_main
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
 
-        hideSystemUI()  //deprecated if API<30
+        hideSystemUI(window)  //deprecated if API<30
         setContentView(layout)
 
         initScreenWidth(this)
@@ -79,27 +79,25 @@ class MainActivity : AppCompatActivity() {
 
         gameSpeed = DEFAULT_SPEED
 
-
         mainView = findViewById(R.id.mainView)
         cactusSpawner = CactusSpawner(mainView)
 
         groundView = findViewById(R.id.groundView)
 
-        score = Score(findViewById(R.id.scoreTextView))
+        scoreManager = Score(findViewById(R.id.scoreTextView))
         dino = Dinosaur(this, findViewById(R.id.dinoImageView))
 
         groundEffect = GroundEffect(mainView, R.drawable.ground)
 
         shakeDetector = ShakeDetector(context) { dino.jump() }
 
-        fullScreenModalDialog = FullScreenModalDialog(this) { recreate() }
 
         initListeners()
 
     }
     override fun onResume() {
         super.onResume()
-        hideSystemUI()
+        hideSystemUI(window)
         if (isGameRunning()) {
             startAll()
         }
@@ -128,11 +126,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun touchScreenResponse() {
         if (!isGameLaunched) {
-            lifecycleScope.launch {
+            mainView.post {
                 launchSequence()
             }
         } else if (isGameRunning()) {
-            lifecycleScope.launch {
+            mainView.post {
                 dino.jump((Tools.screenHeight * 0.4).toInt())
             }
         }
@@ -141,14 +139,12 @@ class MainActivity : AppCompatActivity() {
     private fun launchSequence() {
         isGameLaunched = true
         isGameRunning.value = true
-
-
         startAll()
     }
 
     private fun stopAll(){
         shakeDetector.stopListening()
-        score.stop()
+        scoreManager.stop()
         cactusSpawner.stop()
     }
     private fun startAll(){
@@ -156,14 +152,16 @@ class MainActivity : AppCompatActivity() {
         startGroundMovement()
 
         shakeDetector.startListening()
-        score.start()
-        cactusSpawner.start(dino, groundView)
+        scoreManager.start()
+        mainView.post {
+            cactusSpawner.start(dino, groundView)
+        }
     }
     private fun onGameOver() {
         isGameRunning.value = null
         stopAll()
         window?.decorView?.post {
-            fullScreenModalDialog.show()
+            showReplay()
         }
     }
 
@@ -174,26 +172,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun hideSystemUI() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.decorView.post {
-                window.insetsController?.let { controller ->
-                    controller.hide(WindowInsets.Type.systemBars())
-                    controller.systemBarsBehavior =
-                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                }
+    private fun showReplay() {
+        mainView.post {
+            val replayDialog = Replay(this, scoreManager.score) {
+                recreate()
             }
-        } else {
-            @Suppress("DEPRECATION")
-            window.decorView.systemUiVisibility = (
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                            or View.SYSTEM_UI_FLAG_FULLSCREEN
-                            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    )
+            replayDialog.show()
         }
     }
+
+
 }
