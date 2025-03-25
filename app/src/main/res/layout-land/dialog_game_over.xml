@@ -15,19 +15,20 @@
         android:id="@+id/tv_score"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
         android:text="Game Over!"
         android:textColor="@android:color/white"
         android:textSize="28sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="20dp"/>
+        android:textStyle="bold" />
 
-    <!-- Bouton Image pour Rejouer -->
     <ImageView
         android:id="@+id/btn_replay"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:src="@drawable/replay"
-    android:contentDescription="Rejouer"
-    android:layout_marginTop="16dp"/>
+        android:layout_marginTop="5dp"
+        android:contentDescription="Rejouer"
+        android:src="@drawable/replay" />
+
+    <!-- Bouton Image pour Rejouer -->
 </LinearLayout>

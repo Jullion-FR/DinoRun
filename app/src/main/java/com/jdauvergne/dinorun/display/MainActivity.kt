@@ -2,15 +2,11 @@ package com.jdauvergne.dinorun.display
 
 import ShakeDetector
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.Window
-import android.widget.Button
-import android.widget.TextView
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -19,7 +15,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import com.jdauvergne.dinorun.Dinosaur
 import com.jdauvergne.dinorun.R
-import com.jdauvergne.dinorun.Score
+import com.jdauvergne.dinorun.ScoreManager
 import com.jdauvergne.dinorun.Tools
 import com.jdauvergne.dinorun.Tools.Companion.hideSystemUI
 import com.jdauvergne.dinorun.Tools.Companion.initScreenHeight
@@ -55,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var groundEffect: GroundEffect
     private lateinit var shakeDetector: ShakeDetector
 
-    private lateinit var scoreManager: Score
+    private lateinit var scoreManager: ScoreManager
     private var isGameLaunched = false
 
     private lateinit var context: Context
@@ -84,7 +80,13 @@ class MainActivity : AppCompatActivity() {
 
         groundView = findViewById(R.id.groundView)
 
-        scoreManager = Score(findViewById(R.id.scoreTextView))
+        scoreManager = ScoreManager(
+            context,
+            findViewById(R.id.scoreTextView),
+            findViewById(R.id.highScoreTextView)
+        )
+        scoreManager.resetScore()
+
         dino = Dinosaur(this, findViewById(R.id.dinoImageView))
 
         groundEffect = GroundEffect(mainView, R.drawable.ground)
@@ -174,7 +176,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showReplay() {
         mainView.post {
-            val replayDialog = Replay(this, scoreManager.score) {
+            val replayDialog = ReplayDialog(this, scoreManager.score, scoreManager.highScore) {
                 recreate()
             }
             replayDialog.show()

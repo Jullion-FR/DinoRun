@@ -8,14 +8,14 @@ import kotlin.math.abs
 
 class ShakeDetector(context: Context, private val onShake: () -> Unit) : SensorEventListener {
     private var sensorManager: SensorManager? = null
-    private val shakeThreshold = 6f
+    private val shakeThreshold = 5.5f //todo tweak
 
     init {
         sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
 
     fun startListening() {
-        sensorManager?.registerListener(this, sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager?.registerListener(this, sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_UI)//todo sensor_delay_normal?
     }
 
     fun stopListening() {
