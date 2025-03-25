@@ -8,14 +8,20 @@ import kotlin.math.abs
 
 class ShakeDetector(context: Context, private val onShake: () -> Unit) : SensorEventListener {
     private var sensorManager: SensorManager? = null
-    private val shakeThreshold = 5.5f //todo tweak
+    private val shakeThreshold = 5.8f //todo tweak
+    private val debounceTime = 300L
+    private var lastShakeTime = 0L
 
     init {
         sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
 
     fun startListening() {
-        sensorManager?.registerListener(this, sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_UI)//todo sensor_delay_normal?
+        sensorManager?.registerListener(
+            this,
+            sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+            SensorManager.SENSOR_DELAY_GAME
+        )
     }
 
     fun stopListening() {
@@ -23,16 +29,17 @@ class ShakeDetector(context: Context, private val onShake: () -> Unit) : SensorE
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        if(!MainActivity.isGameRunning()){
+        if (!MainActivity.isGameRunning()) {
             stopListening()
             return
         }
 
         val x = event.values[0]
         val y = event.values[1]
+        val currentTime = System.currentTimeMillis()
 
-        //Diagonal detection
-        if (abs(y+x)/2 > shakeThreshold) {
+        if (abs(y + x*0.9) / 2 > shakeThreshold && (currentTime - lastShakeTime > debounceTime)) {
+            lastShakeTime = currentTime
             onShake.invoke()
         }
     }
