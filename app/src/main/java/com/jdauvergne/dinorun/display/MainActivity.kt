@@ -22,6 +22,7 @@ import com.jdauvergne.dinorun.Tools.Companion.initScreenHeight
 import com.jdauvergne.dinorun.Tools.Companion.initScreenWidth
 import com.jdauvergne.dinorun.cactus.CactusSizesEnum
 import com.jdauvergne.dinorun.cactus.CactusSpawner
+import com.jdauvergne.dinorun.display.dialogs.ReplayDialog
 import com.jdauvergne.dinorun.ground.GroundEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -176,12 +177,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun showReplay() {
         mainView.post {
-            val replayDialog = ReplayDialog(this, scoreManager.score, scoreManager.highScore) {
+            val replayDialog = ReplayDialog(context, scoreManager.score, if(scoreManager.score == scoreManager.highScore) true else false) {
                 recreate()
             }
             replayDialog.show()
         }
     }
-
-
 }

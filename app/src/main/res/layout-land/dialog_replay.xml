@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp"
+    tools:ignore="MissingDefaultResource">
+
+
+    <!-- Texte "Game Over" -->
+
+    <TextView
+        android:id="@+id/dialogTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:text="Game Over!"
+        android:textColor="@android:color/white"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/dialogReplayImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="5dp"
+        android:contentDescription="Rejouer"
+        android:src="@drawable/replay" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/dialogExitButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="#B33A3A"
+            android:text="Menu" />
+
+        <Button
+            android:id="@+id/dialogReplayButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="75dp"
+            android:layout_weight="1"
+            android:background="#3B8544"
+            android:text="Rejouer" />
+    </LinearLayout>
+
+    <!-- Bouton Image pour Rejouer -->
+</LinearLayout>

@@ -7,6 +7,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.jdauvergne.dinorun.R
 import com.jdauvergne.dinorun.Tools
+import com.jdauvergne.dinorun.display.dialogs.CreditDialog
 
 class MenuActivity : AppCompatActivity() {
 
@@ -38,14 +39,7 @@ class MenuActivity : AppCompatActivity() {
         }
     }
 
-    // Méthode pour afficher les crédits (cela peut être une boîte de dialogue ou une nouvelle activité)
     private fun showCredits() {
-        // Vous pouvez afficher une boîte de dialogue simple pour les crédits
-        val creditsMessage = "Développé par: Julien DAUVERGNE\nMerci d'avoir joué !"
-        android.app.AlertDialog.Builder(this)
-            .setTitle("Crédits")
-            .setMessage(creditsMessage)
-            .setPositiveButton("OK", null)
-            .show()
+        CreditDialog(this).show()
     }
 }

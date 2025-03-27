@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp"
+    tools:ignore="MissingDefaultResource">
+
+
+    <!-- Texte "Game Over" -->
+    <TextView
+        android:id="@+id/dialogTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        tools:text="Credits : Mr xxxx" />
+
+    <ImageView
+        android:id="@+id/dialogButtonIV"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:contentDescription="Rejouer"
+        android:src="@drawable/dino_run" />
+
+    <Button
+        android:id="@+id/dialogButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Fermer" />
+
+    <!-- Bouton Image pour Rejouer -->
+</LinearLayout>
