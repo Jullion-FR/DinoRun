@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainView: ConstraintLayout
     private lateinit var groundView: View
 
+
     private lateinit var dino: Dinosaur
     private lateinit var cactusSpawner: CactusSpawner
     private lateinit var groundEffect: GroundEffect
@@ -70,6 +71,12 @@ class MainActivity : AppCompatActivity() {
         initScreenHeight(this)
         CactusSizesEnum.entries.forEach { it.updateSizes(Tools.screenWidth) }
 
+
+        val fargroundView = findViewById<View>(R.id.fargroundView)
+        fargroundView.layoutParams.apply {
+            width = (Tools.screenWidth * 1.1f).toInt()
+        }
+
         context = this
         isGameLaunched = false
         isGameRunning.value = null
@@ -88,9 +95,9 @@ class MainActivity : AppCompatActivity() {
         )
         scoreManager.resetScore()
 
-        dino = Dinosaur(this, findViewById(R.id.dinoImageView))
-
-        groundEffect = GroundEffect(mainView, R.drawable.ground)
+        dino = Dinosaur(context, findViewById(R.id.dinoImageView))
+        val ground_R_IDs = intArrayOf(R.drawable.ground, R.drawable.ground_white)
+        groundEffect = GroundEffect(mainView, ground_R_IDs[1])
 
         shakeDetector = ShakeDetector(context) { dino.jump() }
 
@@ -129,12 +136,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun touchScreenResponse() {
         if (!isGameLaunched) {
-            mainView.post {
+            lifecycleScope.launch {
                 launchSequence()
             }
         } else if (isGameRunning()) {
             mainView.post {
-                dino.jump((Tools.screenHeight * 0.4).toInt())
+                dino.jump((Tools.screenHeight * 0.4f))
             }
         }
     }
@@ -151,14 +158,17 @@ class MainActivity : AppCompatActivity() {
         cactusSpawner.stop()
     }
     private fun startAll(){
-        dino.startSequence()
+        mainView.post {
+            dino.startSequence()
+        }
+
         startGroundMovement()
 
         shakeDetector.startListening()
         scoreManager.start()
-        mainView.post {
-            cactusSpawner.start(dino, groundView)
-        }
+
+        cactusSpawner.start(dino, groundView)
+
     }
     private fun onGameOver() {
         isGameRunning.value = null
