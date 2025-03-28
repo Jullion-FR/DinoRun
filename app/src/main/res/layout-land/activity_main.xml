@@ -5,7 +5,7 @@
     android:id="@+id/mainView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#A29999"
+    android:background="#408bef"
     tools:ignore="MissingDefaultResource">
 
     <!-- Rectangle -->
@@ -13,12 +13,13 @@
         android:id="@+id/groundView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="#375B5454"
+        android:background="#E0742926"
+        android:translationZ="-1dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.125" />
+        app:layout_constraintHeight_percent="0.125"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Dinosaur -->
     <!-- 0.150 is hardcoded but arround 1.2/8 of the screen width-->
@@ -27,14 +28,13 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/groundView"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintDimensionRatio="H,1:1.069"
+        app:layout_constraintHeight_default="percent"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintWidth_default="percent"
         app:layout_constraintWidth_percent="0.15"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintDimensionRatio="H,1:1.069"
         app:srcCompat="@drawable/dino_idle" />
-
 
 
     <TextView
@@ -86,10 +86,20 @@
         tools:text="Score :" />
 
     <View
+        android:id="@+id/view"
         android:layout_width="wrap_content"
         android:layout_height="2dp"
         android:background="#535353"
         app:layout_constraintStart_toStartOf="@+id/groundView"
         app:layout_constraintTop_toTopOf="@+id/groundView" />
+
+    <View
+        android:id="@+id/fargroundView"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:background="@drawable/desert_bg_far"
+        android:translationZ="-1dp"
+        app:layout_constraintBottom_toTopOf="@+id/groundView"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

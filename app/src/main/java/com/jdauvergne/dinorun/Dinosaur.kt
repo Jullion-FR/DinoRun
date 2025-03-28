@@ -1,6 +1,7 @@
 package com.jdauvergne.dinorun
 
 import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.content.Context
 import android.graphics.ImageDecoder
 import android.graphics.drawable.AnimatedImageDrawable
@@ -21,22 +22,37 @@ class Dinosaur(context: Context, val dinoImageView: ImageView) {
 
     private val deathSprite = ContextCompat.getDrawable(context, R.drawable.dino_death)
     private val jumpSprite = ContextCompat.getDrawable(context, R.drawable.dino_jump)
-    private val runningSprite: Drawable? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        ImageDecoder.decodeDrawable(
-            ImageDecoder.createSource(context.resources, R.drawable.dino_run)
-        )
-    } else {
-        ContextCompat.getDrawable(context, R.drawable.dino_run1)
-    }
 
-    private var objectAnimator: ObjectAnimator? = null
+
+    private val runningSprites = listOf(
+        ContextCompat.getDrawable(context, R.drawable.dino_run1),
+        ContextCompat.getDrawable(context, R.drawable.dino_run2)
+    )
+
+    private  var jumpUp: ObjectAnimator
+
+    private  var fallDown: ObjectAnimator
 
     init {
         dinoImageView.setImageResource(R.drawable.dino_idle)
         offsetDinoView()
-        objectAnimator = buildObjectAnimator()
-    }
 
+        fallDown = buildObjectAnimator(buildPropertyValues(0f, 0f))
+        fallDown.apply {
+            doOnEnd {
+                isJumping = false
+                if (MainActivity.isGameRunning()) restartRunGIF()
+            }
+        }
+
+        jumpUp = buildObjectAnimator(buildPropertyValues(0f, 0f))
+        jumpUp.apply {
+            doOnEnd {
+                if (MainActivity.isGameRunning()) fallDown.start()
+            }
+        }
+
+    }
     private fun offsetDinoView() {
         (dinoImageView.layoutParams as ConstraintLayout.LayoutParams).apply {
             setMargins(Tools.screenWidth.toInt() / 8, topMargin, rightMargin, bottomMargin)
@@ -48,62 +64,54 @@ class Dinosaur(context: Context, val dinoImageView: ImageView) {
         CoroutineScope(Dispatchers.Main).launch {
             dinoImageView.setImageDrawable(deathSprite)
             delay(300)
-            jump(125)
+            jump(125f)
         }
     }
 
-    fun jump(height: Int = 400) {
+    fun jump(height: Float = 400f) {
         if (isJumping) return
         isJumping = true
 
-        dinoImageView.setImageDrawable(jumpSprite)
-
         val baseDinoY = dinoImageView.y
 
-        val jumpUp = buildObjectAnimator(baseDinoY, baseDinoY - height)
-        val fallDown = buildObjectAnimator(baseDinoY - height, baseDinoY)
+        jumpUp.setValues(buildPropertyValues(baseDinoY, baseDinoY - height))
+        fallDown.setValues(buildPropertyValues(baseDinoY - height, baseDinoY))
 
-        jumpUp?.apply {
-            addUpdateListener {
-                if(!MainActivity.isGameRunning()) pause()
-            }
-            doOnEnd {
-                if (MainActivity.isGameRunning()) fallDown?.start()
-            }
-        }
-
-        fallDown?.apply {
-            addUpdateListener {
-                if(!MainActivity.isGameRunning()) pause()
-            }
-            doOnEnd {
-                isJumping = false
-                if (MainActivity.isGameRunning()) restartRunGIF()
-            }
-        }
-
-        jumpUp?.start()
+        dinoImageView.setImageDrawable(jumpSprite)
+        jumpUp.start()
     }
 
 
-    private fun buildObjectAnimator(val1: Float? = null, val2: Float? = null): ObjectAnimator? {
-        return if (val1 != null && val2 != null) {
-            ObjectAnimator.ofFloat(dinoImageView, "y", val1, val2).apply {
-                duration = 300
-                addUpdateListener {
-                    if (!MainActivity.isGameRunning()) pause()
+    private fun buildObjectAnimator(propertyValuesHolder:PropertyValuesHolder): ObjectAnimator {
+          val objectAnimator = ObjectAnimator.ofFloat(dinoImageView, "y", 0f, 0f).apply {
+                    duration = 300
+                    addUpdateListener {
+                        if (!MainActivity.isGameRunning()) pause()
+                    }
                 }
-            }
-        } else {
-            null
-        }
+        objectAnimator.setValues(propertyValuesHolder)
+        return objectAnimator
+    }
+
+    private fun buildPropertyValues(val1: Float, val2: Float): PropertyValuesHolder {
+        return  PropertyValuesHolder.ofFloat(
+            "y", val1, val2
+        )
     }
 
     private fun restartRunGIF() {
-        dinoImageView.setImageDrawable(runningSprite)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            (if (runningSprite is AnimatedImageDrawable) runningSprite.start())
+        CoroutineScope(Dispatchers.Main).launch {
+            var index = 0;
+            while (!isJumping){
+                dinoImageView.setImageDrawable(runningSprites[index])
+                index = (++index)%2
+                delay(65)
+            }
         }
+//        dinoImageView.setImageDrawable(runningSprite)
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//            (if (runningSprite is AnimatedImageDrawable) runningSprite.start())
+//        }
     }
 
     fun deathSequence() {
