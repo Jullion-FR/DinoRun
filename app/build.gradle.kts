@@ -16,7 +16,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        setProperty("archivesBaseName", "DinoGame-$versionName")
+        setProperty("archivesBaseName", "DinoRun-$versionName")
     }
     buildTypes {
         release {
