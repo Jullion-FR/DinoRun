@@ -1,5 +1,6 @@
 package com.jdauvergne.dinorun.display
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Window
@@ -8,38 +9,75 @@ import androidx.appcompat.app.AppCompatActivity
 import com.jdauvergne.dinorun.R
 import com.jdauvergne.dinorun.Tools
 import com.jdauvergne.dinorun.display.dialogs.CreditDialog
+import com.jdauvergne.dinorun.display.dialogs.OptionsDialog
+import com.jdauvergne.dinorun.display.dialogs.RulesDialog
 
 class MenuActivity : AppCompatActivity() {
+
+    private lateinit var startButton: Button
+    private lateinit var creditsButton:Button
+    private lateinit var quitButton:Button
+
+    private lateinit var optionsButton:Button
+    private lateinit var rulesButton:Button
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         Tools.hideSystemUI(window)
-        setContentView(R.layout.main_menu) // Assurez-vous que ce fichier est bien activity_menu.xml
+        setContentView(R.layout.main_menu)
 
-        // Références des boutons
-        val startButton: Button = findViewById(R.id.startButton)
-        val creditsButton: Button = findViewById(R.id.creditsButton)
-        val quitButton: Button = findViewById(R.id.quitButton)
+        startButton = findViewById(R.id.startButton)
+        creditsButton = findViewById(R.id.creditsButton)
+        quitButton = findViewById(R.id.quitButton)
 
-        // Lancer l'activité MainActivity lorsque l'on clique sur Démarrer
+        optionsButton = findViewById(R.id.optionsButton)
+        rulesButton = findViewById(R.id.rulesButton)
+
+
+
+        initListeners()
+    }
+
+    private fun initListeners() {
         startButton.setOnClickListener {
+            val prefs = getSharedPreferences(OptionsDialog.PREFS_NAME, Context.MODE_PRIVATE)
+            val isTouchModeEnabled = prefs.getBoolean(OptionsDialog.TOUCH_MODE_KEY, true)
+            val isShakeModeEnabled = prefs.getBoolean(OptionsDialog.SHAKE_MODE_KEY, false)
+
             val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra(OptionsDialog.TOUCH_MODE_KEY, isTouchModeEnabled)
+            intent.putExtra(OptionsDialog.SHAKE_MODE_KEY, isShakeModeEnabled)
             startActivity(intent)
         }
 
-        // Afficher les crédits lorsque l'on clique sur Crédits
         creditsButton.setOnClickListener {
             showCredits()
         }
 
-        // Quitter l'application lorsqu'on clique sur Quitter
         quitButton.setOnClickListener {
-            finish() // Ferme l'activité et retourne à l'écran précédent
+            finish()
+        }
+
+        optionsButton.setOnClickListener {
+            showOptions()
+        }
+
+        rulesButton.setOnClickListener {
+            showRules()
         }
     }
 
+    //These are recreated each time
+    //todo var them to load once
     private fun showCredits() {
         CreditDialog(this).show()
+    }
+    private fun showOptions() {
+        OptionsDialog(this).show()
+    }
+    private fun showRules() {
+        RulesDialog(this).show()
     }
 }

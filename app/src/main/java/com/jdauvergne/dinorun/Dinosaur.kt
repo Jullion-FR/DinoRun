@@ -102,7 +102,7 @@ class Dinosaur(context: Context, val dinoImageView: ImageView) {
     private fun restartRunGIF() {
         CoroutineScope(Dispatchers.Main).launch {
             var index = 0;
-            while (!isJumping){
+            while (!isJumping && MainActivity.isGameRunning()){
                 dinoImageView.setImageDrawable(runningSprites[index])
                 index = (++index)%2
                 delay(65)

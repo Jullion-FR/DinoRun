@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.Window
+import android.widget.TextView
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -22,6 +23,7 @@ import com.jdauvergne.dinorun.Tools.Companion.initScreenHeight
 import com.jdauvergne.dinorun.Tools.Companion.initScreenWidth
 import com.jdauvergne.dinorun.cactus.CactusSizesEnum
 import com.jdauvergne.dinorun.cactus.CactusSpawner
+import com.jdauvergne.dinorun.display.dialogs.OptionsDialog
 import com.jdauvergne.dinorun.display.dialogs.ReplayDialog
 import com.jdauvergne.dinorun.ground.GroundEffect
 import kotlinx.coroutines.delay
@@ -46,17 +48,21 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mainView: ConstraintLayout
     private lateinit var groundView: View
+    private lateinit var startTextView: TextView
 
 
     private lateinit var dino: Dinosaur
     private lateinit var cactusSpawner: CactusSpawner
     private lateinit var groundEffect: GroundEffect
-    private lateinit var shakeDetector: ShakeDetector
+    private var shakeDetector: ShakeDetector? = null
 
     private lateinit var scoreManager: ScoreManager
     private var isGameLaunched = false
 
     private lateinit var context: Context
+
+    private var isTouchModeEnabled = false
+    private var isShakeModeEnabled = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +77,11 @@ class MainActivity : AppCompatActivity() {
         initScreenHeight(this)
         CactusSizesEnum.entries.forEach { it.updateSizes(Tools.screenWidth) }
 
+        startTextView = findViewById(R.id.startTextView)
+        startTextView.text = "Touchez pour commencer."
+
+        isTouchModeEnabled = intent.getBooleanExtra(OptionsDialog.TOUCH_MODE_KEY, true)
+        isShakeModeEnabled = intent.getBooleanExtra(OptionsDialog.SHAKE_MODE_KEY, false)
 
         val fargroundView = findViewById<View>(R.id.fargroundView)
         fargroundView.layoutParams.apply {
@@ -96,11 +107,13 @@ class MainActivity : AppCompatActivity() {
         scoreManager.resetScore()
 
         dino = Dinosaur(context, findViewById(R.id.dinoImageView))
-        val ground_R_IDs = intArrayOf(R.drawable.ground, R.drawable.ground_white)
-        groundEffect = GroundEffect(mainView, ground_R_IDs[1])
 
-        shakeDetector = ShakeDetector(context) { dino.jump() }
+        //val ground_R_IDs = intArrayOf(R.drawable.ground, R.drawable.ground_white)
+        groundEffect = GroundEffect(mainView, R.drawable.ground_white)
 
+        shakeDetector =
+            if(isShakeModeEnabled) ShakeDetector(context) { mainView.post{dino.jump()} }
+                else null
 
         initListeners()
 
@@ -139,7 +152,7 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 launchSequence()
             }
-        } else if (isGameRunning()) {
+        } else if (isGameRunning() && isTouchModeEnabled) {
             mainView.post {
                 dino.jump((Tools.screenHeight * 0.4f))
             }
@@ -149,11 +162,12 @@ class MainActivity : AppCompatActivity() {
     private fun launchSequence() {
         isGameLaunched = true
         isGameRunning.value = true
+        mainView.removeView(startTextView)
         startAll()
     }
 
     private fun stopAll(){
-        shakeDetector.stopListening()
+        shakeDetector?.stopListening()
         scoreManager.stop()
         cactusSpawner.stop()
     }
@@ -164,7 +178,7 @@ class MainActivity : AppCompatActivity() {
 
         startGroundMovement()
 
-        shakeDetector.startListening()
+        shakeDetector?.startListening()
         scoreManager.start()
 
         cactusSpawner.start(dino, groundView)
