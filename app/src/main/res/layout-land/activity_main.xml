@@ -102,4 +102,16 @@
         app:layout_constraintBottom_toTopOf="@+id/groundView"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <TextView
+        android:id="@+id/startTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="34sp"
+        app:layout_constraintBottom_toTopOf="@+id/groundView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Tap to start" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
