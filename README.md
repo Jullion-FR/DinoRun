@@ -11,8 +11,12 @@ Of course Android will block it -> click on "Install anyway"
 
 > It should scale well with devices size !
 
-## However, it lacks :
-- High score save
-- Proper UI (on start and death)
-
-> More background art may arrive (someday)
+## V1.1 is out, UI changes and more :
+- Added a main menu : 
+  - Options
+  - Rules
+  - Credits
+  - Start the game !
+  
+- More colors overall, with background art
+- Performance optimisations
