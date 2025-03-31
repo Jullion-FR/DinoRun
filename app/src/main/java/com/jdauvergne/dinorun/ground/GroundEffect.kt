@@ -66,7 +66,7 @@ class GroundEffect(
         val imageView = ImageView(context)
         imageView.apply {
             setImageDrawable(cachedGround)
-            x = Tools.screenWidth.toFloat()
+            x = Tools.screenWidth
             layoutParams = layoutParam
         }
 

@@ -15,10 +15,12 @@ class ScoreManager(
     private val scoreTextView: TextView,
     private val highScoreTextView: TextView
 ):DinoServiceInterface {
-    private val PREFS_NAME = "game_prefs"
-    private val SCORE_KEY = "saved_score"
-    private val HIGH_SCORE_KEY = "high_score"
-    private val DEFAULT_SCORE = 0
+    companion object{
+        const val PREFS_NAME = "game_prefs"
+        const val SCORE_KEY = "saved_score"
+        const val HIGH_SCORE_KEY = "high_score"
+        private const val DEFAULT_SCORE = 0
+    }
     private var job: Job? = null
     private var isPaused = false
     var score: Int = DEFAULT_SCORE

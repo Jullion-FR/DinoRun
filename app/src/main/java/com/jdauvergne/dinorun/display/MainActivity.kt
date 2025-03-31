@@ -1,6 +1,6 @@
 package com.jdauvergne.dinorun.display
 
-import ShakeDetector
+import com.jdauvergne.dinorun.sensors.ShakeDetector
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     companion object {
-        val DEFAULT_SPEED = 2000L //The lower the faster
+        const val DEFAULT_SPEED = 2000L //The lower the faster
         var gameSpeed: Long = DEFAULT_SPEED
 
         private val isGameRunning = MutableLiveData<Boolean?>()
@@ -117,10 +117,6 @@ class MainActivity : AppCompatActivity() {
         dino = Dinosaur(this, findViewById(R.id.dinoImageView))
         cactusSpawner = CactusSpawner(parentLayout, dino, groundView)
 
-        //val ground_R_IDs = intArrayOf(R.drawable.ground, R.drawable.ground_white)
-        //groundEffect = GroundEffect(parentLayout, R.drawable.ground)
-
-        //todo aled quand je met ground_white pas commenté mon éditeur bug
         groundEffect = GroundEffect(parentLayout, R.drawable.ground_white)
 
         shakeDetector =
@@ -252,7 +248,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun showReplay() {
         parentLayout.post {
-            val replayDialog = ReplayDialog(this, scoreManager.score, if(scoreManager.score == scoreManager.highScore) true else false) {
+            val replayDialog = ReplayDialog(this, scoreManager.score,
+                scoreManager.score == scoreManager.highScore
+            ) {
                 recreate()
             }
             replayDialog.show()

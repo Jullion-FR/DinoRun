@@ -25,7 +25,7 @@ class CactusFactory(
     }
 
 
-    fun buildCactus(size: CactusSizesEnum): CactusInterface {
+    private fun buildCactus(size: CactusSizesEnum): CactusInterface {
         return when(size){
             Small -> Cactus(spritedImageView(Small), size = Small)
             Medium -> Cactus(spritedImageView(Medium), size = Medium)

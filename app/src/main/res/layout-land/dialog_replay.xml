@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:gravity="center"
-        android:text="Game Over!"
+        android:text="@string/game_over"
         android:textColor="@android:color/white"
         android:textSize="28sp"
         android:textStyle="bold" />
@@ -28,10 +28,11 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="5dp"
-        android:contentDescription="Rejouer"
+        android:contentDescription="@string/rejouer"
         android:src="@drawable/replay" />
 
     <LinearLayout
+        style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="32dp"
         android:layout_marginTop="20dp"
@@ -39,20 +40,24 @@
 
         <Button
             android:id="@+id/dialogExitButton"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:background="#B33A3A"
-            android:text="Menu" />
+            android:textColor="@color/white"
+
+            android:text="@string/menu" />
 
         <Button
             android:id="@+id/dialogReplayButton"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginLeft="75dp"
+            android:layout_marginStart="75dp"
             android:layout_weight="1"
             android:background="#3B8544"
-            android:text="Rejouer" />
-    </LinearLayout>
+            android:textColor="@color/white"
 
-    <!-- Bouton Image pour Rejouer -->
+            android:text="@string/rejouer" />
+    </LinearLayout>
 </LinearLayout>

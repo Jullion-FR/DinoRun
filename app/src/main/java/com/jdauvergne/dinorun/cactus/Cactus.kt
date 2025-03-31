@@ -10,10 +10,9 @@ import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.lifecycle.MutableLiveData
 import com.jdauvergne.dinorun.Dinosaur
-import com.jdauvergne.dinorun.display.MainActivity.Companion.gameOver
+import com.jdauvergne.dinorun.R
 import com.jdauvergne.dinorun.display.MainActivity.Companion.gameSpeed
 import com.jdauvergne.dinorun.display.MainActivity.Companion.isGameRunning
-import com.jdauvergne.dinorun.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

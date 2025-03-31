@@ -7,7 +7,7 @@ import com.jdauvergne.dinorun.Tools
 
 abstract class AbstractDialog(
     protected val context:Context,
-    protected val R_ID:Int
+    private val resId:Int
 ) {
     protected val dialog = Dialog(context)
     init {
@@ -16,7 +16,7 @@ abstract class AbstractDialog(
 
     private fun initialize(){
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R_ID)
+        dialog.setContentView(resId)
         dialog.window?.let { Tools.hideSystemUI(window = it) }
         dialog.setCancelable(false)
     }

@@ -27,6 +27,7 @@
         android:id="@+id/dinoImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:contentDescription="@string/image_du_dinosaure"
         app:layout_constraintBottom_toTopOf="@+id/groundView"
         app:layout_constraintDimensionRatio="H,1:1.069"
         app:layout_constraintHeight_default="percent"
@@ -121,6 +122,7 @@
         android:layout_height="54dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
+        android:contentDescription="@string/icone_de_pause"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_media_pause" />

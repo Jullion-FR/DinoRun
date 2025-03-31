@@ -1,11 +1,8 @@
 package com.jdauvergne.dinorun.display.dialogs
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.SeekBar
-import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import com.jdauvergne.dinorun.R
@@ -21,23 +18,20 @@ class OptionsDialog(
         const val VOLUME_KEY = "volume"
     }
 
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
     override fun show() {
         val scoreText = dialog.findViewById<TextView>(R.id.dialogTextView)
         val exitButton = dialog.findViewById<Button>(R.id.exitButton)
 
-        val txt = "Options"
-        scoreText.text = txt
-
+        scoreText.text = "Options"
         exitButton.setOnClickListener { dialog.dismiss() }
 
-        val touchModeSwitch = dialog.findViewById<Switch>(R.id.touchModeSwitch)
-        val shakeModeSwitch = dialog.findViewById<Switch>(R.id.shakeModeSwitch)
+        val touchModeSwitch = dialog.findViewById<SwitchCompat>(R.id.touchModeSwitch)
+        val shakeModeSwitch = dialog.findViewById<SwitchCompat>(R.id.shakeModeSwitch)
         val volumeSeekBar = dialog.findViewById<SeekBar>(R.id.volumeSeekBar)
 
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         var touchEnabled = prefs.getBoolean(TOUCH_MODE_KEY, true)
-        var shakeEnabled = prefs.getBoolean(SHAKE_MODE_KEY, false)
+        val shakeEnabled = prefs.getBoolean(SHAKE_MODE_KEY, false)
         val savedVolume = prefs.getFloat(VOLUME_KEY, 0.5f)
 
         if (!touchEnabled && !shakeEnabled) {
@@ -66,7 +60,7 @@ class OptionsDialog(
 
         volumeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                prefs.edit().putFloat(VOLUME_KEY, progress/100f).apply()
+                prefs.edit().putFloat(VOLUME_KEY, progress / 100f).apply()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}

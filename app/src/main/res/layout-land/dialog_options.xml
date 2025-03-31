@@ -23,17 +23,17 @@
         android:textStyle="bold"
         tools:text="Options" />
 
-    <Switch
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/touchModeSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Touch Mode" />
+        android:text="@string/touch_mode" />
 
-    <Switch
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/shakeModeSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Shake Mode" />
+        android:text="@string/shake_mode" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -42,10 +42,10 @@
 
         <TextView
             android:id="@+id/volumeLabel"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Volume" />
+            android:text="@string/volume" />
 
         <SeekBar
             android:id="@+id/volumeSeekBar"
@@ -62,7 +62,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:background="#B33A3A"
-        android:text="Retour" />
+        android:textColor="@color/white"
+        android:text="@string/retour" />
 
     <!-- Bouton Image pour Rejouer -->
 </LinearLayout>

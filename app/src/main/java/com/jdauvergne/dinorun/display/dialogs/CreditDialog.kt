@@ -2,7 +2,6 @@ package com.jdauvergne.dinorun.display.dialogs
 
 import android.content.Context
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
 import com.jdauvergne.dinorun.R
 

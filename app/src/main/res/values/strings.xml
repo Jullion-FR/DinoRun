@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">DinoRun</string>
+    <string name="touch_mode">Touch Mode</string>
+    <string name="shake_mode">Shake Mode</string>
+    <string name="retour">Retour</string>
+    <string name="image_du_dinosaure">Image du dinosaure.</string>
+    <string name="icone_de_pause">Icone de pause.</string>
+    <string name="volume">Volume</string>
+    <string name="rejouer">Rejouer</string>
+    <string name="fermer">Fermer</string>
+    <string name="game_over">Game Over</string>
+    <string name="menu">Menu</string>
+    <string name="suivant">Suivant</string>
+    <string name="pr_c_dent">Précédent</string>
+    <string name="dino_run">Dino Run</string>
+    <string name="d_marrer">Démarrer</string>
+    <string name="r_gles">Règles</string>
+    <string name="options">Options</string>
+    <string name="cr_dits">Crédits</string>
+    <string name="quitter">Quitter</string>
 </resources>
