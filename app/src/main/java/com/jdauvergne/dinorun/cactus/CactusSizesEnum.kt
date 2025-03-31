@@ -1,7 +1,12 @@
 package com.jdauvergne.dinorun.cactus
 
 import com.jdauvergne.dinorun.R
-
+/**
+ * Enum representing different cactus sizes in the game.
+ * Each size has a list of associated sprite resources and dynamically calculated dimensions.
+ *
+ * @property spriteIdList List of drawable resource IDs for the cactus sprites.
+ */
 enum class CactusSizesEnum(val spriteIdList: List<Int>) {
     Small(
         listOf(
