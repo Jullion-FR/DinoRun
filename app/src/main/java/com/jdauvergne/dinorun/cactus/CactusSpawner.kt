@@ -27,7 +27,7 @@ class CactusSpawner(
     private val activeGroupList: MutableList<CactusGroup> = mutableListOf()
     private var isPaused = false
 
-    fun start() {
+    override fun start() {
         job = CoroutineScope(Dispatchers.Main).launch {
             val lifecycleOwner = context as LifecycleOwner
             val minDelay = 1200L

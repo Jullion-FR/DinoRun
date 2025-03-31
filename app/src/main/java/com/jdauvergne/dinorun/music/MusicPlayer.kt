@@ -6,8 +6,9 @@ import com.jdauvergne.dinorun.display.dialogs.OptionsDialog
 
 class MusicPlayer(private val context: Context): DinoServiceInterface {
 
+    var music = Music.GAME1
     private var mediaPlayer: MediaPlayer? = null
-     fun start(music: Music) {
+     override fun start() {
         val prefs = context.getSharedPreferences(OptionsDialog.PREFS_NAME, Context.MODE_PRIVATE)
         val volume = prefs.getFloat(OptionsDialog.VOLUME_KEY, 0.5f) // Récupération du volume
 

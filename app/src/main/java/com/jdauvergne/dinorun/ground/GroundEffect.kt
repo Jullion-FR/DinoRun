@@ -73,7 +73,7 @@ class GroundEffect(
         return imageView
     }
 
-    fun start() {
+    override fun start() {
         CoroutineScope(Dispatchers.Main).launch {
             delay(1075)
             startFirstMovementLoop()
@@ -85,7 +85,7 @@ class GroundEffect(
     }
 
     override fun pause() {
-        animators.forEach { it.pause(); println(animators.indexOf(it))}
+        animators.forEach { it.pause() }
     }
 
     override fun resume() {

@@ -41,8 +41,8 @@ class MenuActivity : AppCompatActivity() {
 
 
         initListeners()
-
-        musicPlayer.start(Music.MENU1)
+        musicPlayer.music = Music.MENU1
+        musicPlayer.start()
     }
 
     override fun onResume() {

@@ -20,7 +20,7 @@ class ShakeDetector(context: Context, private val onShake: () -> Unit) : SensorE
         sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
 
-    fun start() {
+    override fun start() {
         startListening()
     }
 

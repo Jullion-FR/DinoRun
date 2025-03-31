@@ -57,7 +57,7 @@ class Dinosaur(context: Context, val dinoImageView: ImageView): DinoServiceInter
         }
     }
 
-     fun start() {
+     override fun start() {
         CoroutineScope(Dispatchers.Main).launch {
             dinoImageView.setImageDrawable(deathSprite)
             delay(300)

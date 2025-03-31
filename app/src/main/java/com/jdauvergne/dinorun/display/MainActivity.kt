@@ -192,7 +192,8 @@ class MainActivity : AppCompatActivity() {
             scoreManager.start()
             services.add(scoreManager)
 
-            musicPlayer.start(Music.GAME1)
+            musicPlayer.music = Music.GAME1
+            musicPlayer.start()
             services.add(musicPlayer)
         }
     }

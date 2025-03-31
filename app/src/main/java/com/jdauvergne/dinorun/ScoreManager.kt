@@ -72,7 +72,7 @@ class ScoreManager(
         updateScoreView()
     }
 
-    fun start() {
+    override fun start() {
         if (job == null || job?.isCancelled == true) {
             job = CoroutineScope(Dispatchers.Main).launch {
                 while (job?.isActive == true) {
