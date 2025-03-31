@@ -56,6 +56,16 @@ class CactusGroup(
         forEachCactus { it.stopMovement() }
     }
 
+    // Implémentation de pauseMovement()
+    override fun pauseMovement() {
+        forEachCactus { it.pauseMovement() }
+    }
+
+    // Implémentation de resumeMovement()
+    override fun resumeMovement() {
+        forEachCactus { it.resumeMovement() }
+    }
+
     override fun startCollisionCheck(dinosaur: Dinosaur) {
         forEachCactus { it.startCollisionCheck(dinosaur) }
     }
@@ -72,14 +82,14 @@ class CactusGroup(
         forEachCactus { it.dropSelfFromParent() }
     }
 
-    fun add(cactus: CactusInterface, index:Int = -1){
-        if(index < 0 || index > cactusList.size-1) cactusList.add(cactus)
+    fun add(cactus: CactusInterface, index: Int = -1) {
+        if (index < 0 || index > cactusList.size - 1) cactusList.add(cactus)
         else cactusList.add(index, cactus)
     }
 
     private fun CactusInterface.observeCactus(lifecycleOwner: LifecycleOwner) {
         isMoving.observe(lifecycleOwner) { isActive ->
-            if (!isActive){
+            if (!isActive) {
                 this@CactusGroup.isMoving.value = false
                 this@CactusGroup.stopCollisionCheck()
                 this@CactusGroup.dropSelfFromParent()

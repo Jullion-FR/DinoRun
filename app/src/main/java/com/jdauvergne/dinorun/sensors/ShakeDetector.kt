@@ -3,28 +3,49 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import com.jdauvergne.dinorun.DinoServiceInterface
 import com.jdauvergne.dinorun.display.MainActivity
 import kotlin.math.abs
 
-class ShakeDetector(context: Context, private val onShake: () -> Unit) : SensorEventListener {
+class ShakeDetector(context: Context, private val onShake: () -> Unit) : SensorEventListener, DinoServiceInterface {
     private var sensorManager: SensorManager? = null
     private val shakeThreshold = 5.8f //todo tweak
     private val debounceTime = 300L
     private var lastShakeTime = 0L
+    private var isPaused = false
 
     init {
         sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
 
-    fun startListening() {
-        sensorManager?.registerListener(
-            this,
-            sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-            SensorManager.SENSOR_DELAY_GAME
-        )
+    fun start() {
+        startListening()
     }
 
-    fun stopListening() {
+    override fun stop() {
+        stopListening()
+    }
+
+    override fun pause() {
+        isPaused = true
+    }
+
+    override fun resume() {
+        isPaused = false
+        startListening() // Reprend l'écoute des secousses
+    }
+
+    private fun startListening() {
+        if (!isPaused) {
+            sensorManager?.registerListener(
+                this,
+                sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_GAME
+            )
+        }
+    }
+
+    private fun stopListening() {
         sensorManager?.unregisterListener(this)
     }
 
@@ -33,6 +54,8 @@ class ShakeDetector(context: Context, private val onShake: () -> Unit) : SensorE
             stopListening()
             return
         }
+
+        if (isPaused) return // Ignore les secousses si en pause
 
         val x = event.values[0]
         val y = event.values[1]

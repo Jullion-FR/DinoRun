@@ -3,21 +3,18 @@ package com.jdauvergne.dinorun
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.content.Context
-import android.graphics.ImageDecoder
-import android.graphics.drawable.AnimatedImageDrawable
-import android.graphics.drawable.Drawable
-import android.os.Build
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import com.jdauvergne.dinorun.display.MainActivity
+import com.jdauvergne.dinorun.display.MainActivity.Companion.gameOver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class Dinosaur(context: Context, val dinoImageView: ImageView) {
+class Dinosaur(context: Context, val dinoImageView: ImageView): DinoServiceInterface {
     private var isJumping = false
 
     private val deathSprite = ContextCompat.getDrawable(context, R.drawable.dino_death)
@@ -30,8 +27,9 @@ class Dinosaur(context: Context, val dinoImageView: ImageView) {
     )
 
     private  var jumpUp: ObjectAnimator
-
     private  var fallDown: ObjectAnimator
+
+    private var isPaused = false
 
     init {
         dinoImageView.setImageResource(R.drawable.dino_idle)
@@ -41,7 +39,6 @@ class Dinosaur(context: Context, val dinoImageView: ImageView) {
         fallDown.apply {
             doOnEnd {
                 isJumping = false
-                if (MainActivity.isGameRunning()) restartRunGIF()
             }
         }
 
@@ -60,16 +57,17 @@ class Dinosaur(context: Context, val dinoImageView: ImageView) {
         }
     }
 
-     fun startSequence() {
+     fun start() {
         CoroutineScope(Dispatchers.Main).launch {
             dinoImageView.setImageDrawable(deathSprite)
             delay(300)
             jump(125f)
+            startRunGIF()
         }
     }
 
     fun jump(height: Float = 400f) {
-        if (isJumping) return
+        if (isJumping || isPaused) return
         isJumping = true
 
         val baseDinoY = dinoImageView.y
@@ -99,23 +97,36 @@ class Dinosaur(context: Context, val dinoImageView: ImageView) {
         )
     }
 
-    private fun restartRunGIF() {
+    private fun startRunGIF() {
         CoroutineScope(Dispatchers.Main).launch {
             var index = 0;
-            while (!isJumping && MainActivity.isGameRunning()){
-                dinoImageView.setImageDrawable(runningSprites[index])
-                index = (++index)%2
+            while (MainActivity.isGameRunning()){
+                if(!isPaused && !isJumping){
+                    dinoImageView.setImageDrawable(runningSprites[index])
+                    index = (++index)%2
+                }
                 delay(65)
             }
         }
-//        dinoImageView.setImageDrawable(runningSprite)
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-//            (if (runningSprite is AnimatedImageDrawable) runningSprite.start())
-//        }
     }
 
-    fun deathSequence() {
-        dinoImageView.setImageDrawable(deathSprite)
+    fun death() {
+        dinoImageView.post {
+            dinoImageView.setImageDrawable(deathSprite)
+        }
+        gameOver()
+    }
+
+    override fun stop() {
+        death()
+    }
+
+    override fun pause() {
+        isPaused = true
+    }
+
+    override fun resume() {
+        isPaused = false
     }
 
 }

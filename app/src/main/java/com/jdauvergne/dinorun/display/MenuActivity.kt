@@ -11,6 +11,8 @@ import com.jdauvergne.dinorun.Tools
 import com.jdauvergne.dinorun.display.dialogs.CreditDialog
 import com.jdauvergne.dinorun.display.dialogs.OptionsDialog
 import com.jdauvergne.dinorun.display.dialogs.RulesDialog
+import com.jdauvergne.dinorun.music.Music
+import com.jdauvergne.dinorun.music.MusicPlayer
 
 class MenuActivity : AppCompatActivity() {
 
@@ -20,6 +22,8 @@ class MenuActivity : AppCompatActivity() {
 
     private lateinit var optionsButton:Button
     private lateinit var rulesButton:Button
+    private val musicPlayer = MusicPlayer(this)
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,8 +40,19 @@ class MenuActivity : AppCompatActivity() {
         rulesButton = findViewById(R.id.rulesButton)
 
 
-
         initListeners()
+
+        musicPlayer.start(Music.MENU1)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        musicPlayer.resume()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        musicPlayer.stop()
     }
 
     private fun initListeners() {
@@ -50,6 +65,7 @@ class MenuActivity : AppCompatActivity() {
             intent.putExtra(OptionsDialog.TOUCH_MODE_KEY, isTouchModeEnabled)
             intent.putExtra(OptionsDialog.SHAKE_MODE_KEY, isShakeModeEnabled)
             startActivity(intent)
+            this.finish()
         }
 
         creditsButton.setOnClickListener {

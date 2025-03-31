@@ -14,7 +14,6 @@ import com.jdauvergne.dinorun.display.MainActivity.Companion.gameOver
 import com.jdauvergne.dinorun.display.MainActivity.Companion.gameSpeed
 import com.jdauvergne.dinorun.display.MainActivity.Companion.isGameRunning
 import com.jdauvergne.dinorun.R
-import com.jdauvergne.dinorun.Tools
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -28,7 +27,7 @@ import kotlinx.coroutines.launch
 class Cactus(
     private val cactusImageView: ImageView,
     val size: CactusSizesEnum
-):CactusInterface {
+): CactusInterface {
     override var x: Float
         get() = cactusImageView.x
         set(value) {
@@ -46,7 +45,7 @@ class Cactus(
     override fun startMovement(startX: Float?, targetX: Float?) {
         if (startX == null || targetX == null) return
 
-        val action = {
+        cactusImageView.post {
             movementAnimator = ObjectAnimator.ofFloat(
                 cactusImageView,
                 "x",
@@ -57,6 +56,9 @@ class Cactus(
                 duration = gameSpeed
                 addUpdateListener {
                     if (!isGameRunning()) pause()
+                    if(cactusImageView.x <= -(size.width*2) ) {
+                        cancel()
+                    }
                 }
                 doOnStart {
                     isMoving.value = true
@@ -67,12 +69,6 @@ class Cactus(
                 start()
             }
         }
-
-        if (cactusImageView.isAttachedToWindow) {
-            action()
-        } else {
-            cactusImageView.post { action() }
-        }
     }
 
     override fun stopMovement() {
@@ -81,11 +77,18 @@ class Cactus(
         }
     }
 
+    override fun pauseMovement() {
+        movementAnimator?.pause()
+    }
+
+    override fun resumeMovement() {
+        movementAnimator?.resume()
+    }
+
     override fun initialize(anchorView: View?, xPos: Float) {
         cactusImageView.layoutParams = buildCactusConstraints(anchorView)
         x = xPos
     }
-
 
     override fun stopCollisionCheck() {
         job?.cancel()
@@ -124,9 +127,8 @@ class Cactus(
         job = CoroutineScope(Dispatchers.Main).launch {
             collisionFlow(dinosaur).collect { collided ->
                 if (collided) {
-                    gameOver()
                     println("Ouch, it's a cactus")
-                    dinosaur.deathSequence()
+                    dinosaur.death()
                 }
             }
         }
@@ -158,3 +160,4 @@ class Cactus(
         }
     }.flowOn(Dispatchers.Default)
 }
+

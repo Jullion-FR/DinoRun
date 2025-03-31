@@ -14,12 +14,13 @@ class ScoreManager(
     private val context: Context,
     private val scoreTextView: TextView,
     private val highScoreTextView: TextView
-) {
+):DinoServiceInterface {
     private val PREFS_NAME = "game_prefs"
     private val SCORE_KEY = "saved_score"
     private val HIGH_SCORE_KEY = "high_score"
     private val DEFAULT_SCORE = 0
     private var job: Job? = null
+    private var isPaused = false
     var score: Int = DEFAULT_SCORE
         private set
     var highScore: Int = DEFAULT_SCORE
@@ -53,11 +54,11 @@ class ScoreManager(
         updateScoreView()
     }
 
-
     @SuppressLint("SetTextI18n")
     private fun updateScoreView(){
         scoreTextView.text = "Score: ${score.toString().padStart(5, '0')}"
     }
+
     @SuppressLint("SetTextI18n")
     private fun updateHighScoreView(){
         highScoreTextView.text = "High Score: ${highScore.toString().padStart(5, '0')}"
@@ -70,20 +71,32 @@ class ScoreManager(
     }
 
     fun start() {
-        job?.cancel()
-        job = CoroutineScope(Dispatchers.Main).launch {
-            while (job?.isActive == true) {
-                incrementScore()
-                if (score % 500 == 0) {
-                    MainActivity.gameSpeed -= 50
-                    println("Time to speed up ! : ${MainActivity.gameSpeed}")
+        if (job == null || job?.isCancelled == true) {
+            job = CoroutineScope(Dispatchers.Main).launch {
+                while (job?.isActive == true) {
+                    if (!isPaused) {
+                        incrementScore()
+                        if (score % 500 == 0) {
+                            MainActivity.gameSpeed -= 50
+                            println("Time to speed up! : ${MainActivity.gameSpeed}")
+                        }
+                    }
+                    delay(100)
                 }
-                delay(100)
             }
         }
     }
 
-    fun stop(){
+    override fun stop() {
         job?.cancel()
+        job = null
+    }
+
+    override fun pause() {
+        isPaused = true
+    }
+
+    override fun resume() {
+        isPaused = false
     }
 }

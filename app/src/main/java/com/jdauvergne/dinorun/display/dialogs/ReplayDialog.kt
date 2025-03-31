@@ -7,15 +7,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat.startActivity
 import com.jdauvergne.dinorun.R
+import com.jdauvergne.dinorun.display.MainActivity
 import com.jdauvergne.dinorun.display.MenuActivity
 
 
 class ReplayDialog(
-    context: Context,
+    private val mainActivity: MainActivity,
     private val score: Int,
     private val isHighScore:Boolean = false,
-    private val onReplay: () -> Unit,
-) : AbstractDialog(context, R.layout.dialog_replay)
+    private val onReplay: () -> Unit
+) : AbstractDialog(mainActivity, R.layout.dialog_replay)
  {
     override fun show() {
         val scoreText = dialog.findViewById<TextView>(R.id.dialogTextView)
@@ -49,5 +50,6 @@ class ReplayDialog(
      private fun exit(){
          val intent = Intent(context, MenuActivity::class.java)
          startActivity(context, intent, null)
+         mainActivity.finish()
      }
 }
