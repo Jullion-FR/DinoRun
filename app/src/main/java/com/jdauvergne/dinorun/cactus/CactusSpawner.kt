@@ -34,6 +34,7 @@ class CactusSpawner(
             val minDelay = 1200L
             val maxDelay = 2000L
             var delay: Long
+            delay(2000)
             while (isActive) {
                 if (!isPaused) {
                     (cactusFactory.buildCactusGroup(CactusGroupsEnum.entries.random()) as CactusGroup).apply {

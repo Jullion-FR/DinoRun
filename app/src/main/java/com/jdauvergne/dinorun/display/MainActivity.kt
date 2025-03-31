@@ -184,17 +184,11 @@ class MainActivity : AppCompatActivity() {
             dino.start()
             services.add(dino)
 
-            lifecycleScope.launch {
-                delay(1075)
-                groundEffect.start()
-                services.add(groundEffect)
-            }
+            groundEffect.start()
+            services.add(groundEffect)
 
-            lifecycleScope.launch {
-                delay(1075)
-                cactusSpawner.start()
-                services.add(cactusSpawner)
-            }
+            cactusSpawner.start()
+            services.add(cactusSpawner)
 
             shakeDetector?.start()
             shakeDetector?.let { services.add(it) }

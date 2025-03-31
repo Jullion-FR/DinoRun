@@ -12,11 +12,15 @@ import com.jdauvergne.dinorun.display.MainActivity.Companion.gameSpeed
 import com.jdauvergne.dinorun.display.MainActivity.Companion.isGameRunning
 import com.jdauvergne.dinorun.R
 import com.jdauvergne.dinorun.Tools
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class GroundEffect(
     private val parentLayout: ConstraintLayout,
     drawableId: Int
-):DinoServiceInterface {
+) : DinoServiceInterface {
     private val context = parentLayout.context
     private val cachedGround: Drawable? = ContextCompat.getDrawable(context, drawableId)
     private lateinit var groundList: List<GroundEffectSplit>
@@ -25,7 +29,7 @@ class GroundEffect(
     private val groundWidth = (Tools.screenWidth * 1.05).toInt()
     private val groundHeight = (groundWidth * ratio).toInt()
 
-    private var animator: ObjectAnimator? = null
+    private val animators = mutableListOf<ObjectAnimator>()
 
     init {
         initialize()
@@ -70,60 +74,54 @@ class GroundEffect(
     }
 
     fun start() {
-        startFirstMovementLoop()
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(1075)
+            startFirstMovementLoop()
+        }
     }
 
     override fun stop() {
-        animator?.cancel()
+        animators.forEach { it.cancel() }
     }
 
     override fun pause() {
-        animator?.pause()
+        animators.forEach { it.pause(); println(animators.indexOf(it))}
     }
 
     override fun resume() {
-        animator?.resume()
+        animators.forEach { it.resume() }
     }
 
     private fun startFirstMovementLoop() {
-        var groundImageView: ImageView
-
         groundList.forEachIndexed { index, groundImageSplit ->
-            groundImageView = groundImageSplit.groundEffectImageView
+            val groundImageView = groundImageSplit.groundEffectImageView
 
-            animator = buildMovementLooper(groundImageView)
-
+            val animator = buildMovementLooper(groundImageView)
             if (index == 0) {
-                animator?.apply {
-                    val propertyValuesHolder = PropertyValuesHolder.ofFloat(
-                        "x", 0f, Tools.globalMaxLeftX * 2
-                    )
+                animator.apply {
+                    val propertyValuesHolder = PropertyValuesHolder.ofFloat("x", 0f, Tools.globalMaxLeftX * 2)
                     setValues(propertyValuesHolder)
 
                     addUpdateListener {
                         if ((target as ImageView).x <= Tools.globalMaxLeftX) {
                             cancel()
-                            buildMovementLooper(target as ImageView)?.start()
+                            val i = animators.indexOf(this)
+                            animators[i] = buildMovementLooper(target as ImageView)
+                            animators[i].start()
                         }
                     }
                 }
             }
-            animator?.start()
+            animator.start()
+            animators.add(animator)
         }
     }
 
-    private fun buildMovementLooper(groundImageView: ImageView): ObjectAnimator? {
-        val startX: Float = Tools.screenWidth.toFloat()
-        val targetX: Float = Tools.globalMaxLeftX.toFloat()
-        val movementAnimator: ObjectAnimator
+    private fun buildMovementLooper(groundImageView: ImageView): ObjectAnimator {
+        val startX: Float = Tools.screenWidth
+        val targetX: Float = Tools.globalMaxLeftX
 
-        try {
-            movementAnimator = ObjectAnimator.ofFloat(
-                groundImageView,
-                "x",
-                startX,
-                targetX
-            ).apply {
+        return ObjectAnimator.ofFloat(groundImageView, "x", startX, targetX).apply {
                 interpolator = LinearInterpolator()
                 duration = gameSpeed
                 repeatCount = ObjectAnimator.INFINITE
@@ -132,10 +130,5 @@ class GroundEffect(
                     if (!isGameRunning()) pause()
                 }
             }
-        } catch (e: Exception) {
-            return null
-        }
-
-        return movementAnimator
     }
 }
